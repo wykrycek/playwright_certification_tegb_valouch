@@ -1,0 +1,39 @@
+{
+  "name": "playwright_certification_tegb_valouch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "ui": "playwright test --ui",
+    "start": "playwright test --ui",
+    "test:ces": "LANG=ces npx playwright test --ui",
+    "test:eng": "LANG=eng npx playwright test --ui",
+    "test": "playwright test --project=chromium"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wykrycek/playwright_certification_tegb_valouch.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wykrycek/playwright_certification_tegb_valouch/issues"
+  },
+  "homepage": "https://github.com/wykrycek/playwright_certification_tegb_valouch#readme",
+  "description": "",
+  "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.15.29",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.29.0"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.6.0",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.5.0",
+    "path": "^0.12.7"
+  }
+}

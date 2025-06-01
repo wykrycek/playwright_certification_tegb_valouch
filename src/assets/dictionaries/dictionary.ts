@@ -1,0 +1,77 @@
+const tegb = {
+    ces: {
+        dashboard: {
+            profileDetails: {
+                heading: "Detaily Profilu",
+                editProfileButton: "Upravit profil",
+                username: "Jméno:",
+                surname: "Příjmení:",
+                email: "Email:",
+                phone: "Telefon:",
+                age: "Věk:",
+                updatedMessage: "Profile updated successfully!",
+            },
+            accountsDetail: {
+                heading: "Účty",
+                newAccountButton: "Přidat účet",
+                errorMessage: "Unexpected error occured. Please try again later.",
+                accounts: {
+                    accountNumber: "Číslo účtu",
+                    balance: "Zůstatek",
+                    accountType: "Typ účtu",
+                },
+            },
+            header: {
+                title: "TEG#B Dashboard",
+                logoutButton: "Odhlásit se",
+            },
+            leftMenu: {
+                home: "Domů",
+                accounts: "Účty",
+                transactions: "Transakce",
+                support: "Podpora",
+            },
+        },
+    },
+    eng: {
+        dashboard: {
+            profileDetails: {
+                heading: "Profile Details",
+                editProfileButton: "Edit Profile",
+                username: "Name:",
+                surname: "Surname:",
+                email: "Email:",
+                phone: "Phone:",
+                age: "Age:",
+                updatedMessage: "Profile updated successfully!",
+            },
+            accountsDetail: {
+                heading: "Accounts",
+                newAccountButton: "Add Account",
+                errorMessage: "Unexpected error occurred. Please try again later.",
+                accounts: {
+                    accountNumber: "Account Number",
+                    balance: "Balance",
+                    accountType: "Account Type",
+                },
+            },
+            header: {
+                title: "TEG#B Dashboard",
+                logoutButton: "Log Out",
+            },
+            leftMenu: {
+                home: "Home",
+                accounts: "Accounts",
+                transactions: "Transactions",
+                support: "Support",
+            },
+        },
+    },
+};
+
+export type SupportedLanguages = keyof typeof tegb;
+export const dictionary = tegb[
+    (process.env.LANG as SupportedLanguages) || "ces"
+];
+export default dictionary;
+export type Dictionary = typeof dictionary;
