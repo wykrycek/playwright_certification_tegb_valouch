@@ -70,8 +70,7 @@ const tegb = {
 };
 
 export type SupportedLanguages = keyof typeof tegb;
-export const dictionary = tegb[
-    (process.env.LANG as SupportedLanguages) || "ces"
-];
+export const dictionary = tegb[(process.env.APP_LANG as SupportedLanguages) || "ces"];
 export default dictionary;
+export const getDictionary = (lang: SupportedLanguages) => tegb[lang] || tegb.ces;
 export type Dictionary = typeof dictionary;

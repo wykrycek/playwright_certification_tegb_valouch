@@ -5,8 +5,8 @@
   "scripts": {
     "ui": "playwright test --ui",
     "start": "playwright test --ui",
-    "test:ces": "LANG=ces npx playwright test --ui",
-    "test:eng": "LANG=eng npx playwright test --ui",
+    "test:ces": "APP_LANG=ces npx playwright test --ui",
+    "test:eng": "APP_LANG=eng npx playwright test --ui",
     "test": "playwright test --project=chromium"
   },
   "repository": {

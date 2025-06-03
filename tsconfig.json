@@ -8,8 +8,9 @@
     "outDir": "./dist",
     "noEmit": true,
     "allowImportingTsExtensions": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "types": ["node", "playwright"]
   },
-  "include": ["src"],
+  "include": ["src", "tests"],
   "exclude": ["node_modules", "dist"]
 }

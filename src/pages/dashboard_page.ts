@@ -99,9 +99,9 @@ export class DashboardPage {
         this.accountBalanceHeading = page.locator('//th[@data-testid="account-balance-heading"]');
         this.accountTypeHeading = page.locator('//th[@data-testid="account-type-heading"]');
         this.accountsRows = page.locator('.account-row');
-        this.accountNumberText = page.locator('//div[@data-testid="account-number"]');
-        this.accountBalanceText = page.locator('//div[@data-testid="account-balance"]');
-        this.accountTypeText = page.locator('//div[@data-testid="account-type"]');
+        this.accountNumberText = page.locator('//td[@data-testid="account-number"]');
+        this.accountBalanceText = page.locator('//td[@data-testid="account-balance"]');
+        this.accountTypeText = page.locator('//td[@data-testid="account-type"]');
 
         this.footer = page.locator('//footer[@class="dashboard-footer"]');
         this.footerCopyright = page.locator('//footer[@class="dashboard-footer"]/span');
@@ -131,27 +131,27 @@ export class DashboardPage {
         return await locator.evaluate(node => node.lastChild?.textContent?.trim() || '');
     }
 
-    async checkFirstname(name: string): Promise<DashboardPage> {
+    async firstnameToHaveText(name: string): Promise<DashboardPage> {
         expect.soft(await this.getTextBoxValue(this.firstnameFrame)).toContain(name);
         return this;
     }
 
-    async checkSurname(surname: string): Promise<DashboardPage> {
+    async surnameToHaveText(surname: string): Promise<DashboardPage> {
         expect.soft(await this.getTextBoxValue(this.surnameFrame)).toContain(surname);
         return this;
     }
 
-    async checkEmail(email: string): Promise<DashboardPage> {
+    async emailToHaveText(email: string): Promise<DashboardPage> {
         expect.soft(await this.getTextBoxValue(this.emailFrame)).toContain(email);
         return this;
     }
 
-    async checkPhone(phone: string): Promise<DashboardPage> {
+    async phoneToHaveText(phone: string): Promise<DashboardPage> {
         expect.soft(await this.getTextBoxValue(this.phoneFrame)).toContain(phone);
         return this;
     }
 
-    async checkAge(age: number): Promise<DashboardPage> {
+    async ageToHaveText(age: number): Promise<DashboardPage> {
         expect.soft(await this.getTextBoxValue(this.ageFrame)).toContain(String(age));
         return this;
     }
@@ -163,20 +163,40 @@ export class DashboardPage {
         return this;
     }
 
-    async checkNthAccount(index: number, account: accountData): Promise<DashboardPage> {
-        await expect.soft(this.accountsRows.nth(index)).toBeVisible();
-        await expect.soft(this.accountsRows.nth(index)).toContainText(account.accountNumber);
-        await expect.soft(this.accountsRows.nth(index)).toBeVisible();
-        await expect.soft(this.accountsRows.nth(index)).toContainText(String(account.balance));
-        await expect.soft(this.accountsRows.nth(index)).toBeVisible();
-        await expect.soft(this.accountsRows.nth(index)).toContainText(account.accountType);
+    async checkAccountsErrorMessageNotBeVisible(): Promise<DashboardPage> {
+        await expect(this.accountsErrorMessage).not.toBeVisible().then(() => this);
         return this;
     }
 
+    async checkAccountsTableVisible(): Promise<DashboardPage> {
+        await expect(this.accountsTable).toBeVisible().then(() => this);
+        return this;
+    }
+
+
+
+    async checkNthAccount(index: number, account: accountData): Promise<DashboardPage> {
+        await expect.soft(this.accountsRows.nth(index)).toBeVisible();
+        await expect.soft(this.accountNumberText.nth(index)).toBeVisible();
+        await expect.soft(this.accountNumberText.nth(index)).toContainText(account.accountNumber);
+        await expect.soft(this.accountBalanceText.nth(index)).toBeVisible();
+        await expect.soft(this.accountBalanceText.nth(index)).toContainText(String(account.balance));
+        await expect.soft(this.accountTypeText.nth(index)).toBeVisible();
+        await expect.soft(this.accountTypeText.nth(index)).toContainText(account.accountType);
+        return this;
+    }
+/*
     async checkAllAccounts(accountList: accountsResponse): Promise<DashboardPage> {
-        accountList.forEach(async (account, index) => {
+        await Promise.all(accountList.map(async (account, index) => {
             await this.checkNthAccount(index, account);
-        });
+        }));
+        return this;
+    }
+*/
+    async checkAllAccounts(accountList: accountsResponse): Promise<DashboardPage> {
+        await Promise.all(accountList.map(async (account, index) => {
+            await this.checkNthAccount(index, account);
+        }));
         return this;
     }
 

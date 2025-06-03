@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-process.env.LANG = process.env.LANG || 'ces'; // Nastavení výchozího jazyka pro UI testy
+process.env.APP_LANG = process.env.APP_LANG || ''; // Nastavení výchozího jazyka pro UI testy
 process.env.TEGB_URL_FRONTEND = process.env.TEGB_URL_FRONTEND || ''; // Nastavení výchozí URL frontend aplikace
 process.env.TEGB_URL_BACKEND = process.env.TEGB_URL_BACKEND || ''; // Nastavení výchozí URL backend aplikace
 process.env.TEGB_USERNAME = process.env.TEGB_USERNAME || ''; // Nastavení výchozího uživatelského jména pro testy

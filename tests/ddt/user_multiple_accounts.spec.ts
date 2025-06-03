@@ -30,43 +30,6 @@ test.describe("DDT - Více účtů uživatele", {
     };
     const createdAccounts: APIResponse[] = [];
 
-/*     test.beforeEach(async ({ page, request }) => {
-        // Inicializace API a přihlašovací stránky
-        backendApi = new BackendApi(request);
-        const loginPage = new LoginPage(page);
-
-        // Vytvoření uživatele
-        const email = faker.internet.exampleEmail();
-        const username = faker.internet.username();
-        const password = faker.internet.password();
-
-        await backendApi.registerUser(username, password, email);
-        const loginResponse = await backendApi.successLogin(username, password);
-        const loginBody = await loginResponse.json();
-
-        userCredentials = {
-            email,
-            username,
-            password,
-            accessToken: loginBody.access_token
-        };
-
-        // Vytvoření všech účtů najednou
-        accountBalances.forEach(async (accountData,) => {
-            const accountType = randomBankAccountType();
-            const response = await backendApi.createBankAccount(
-                userCredentials.accessToken,
-                accountData.startBalance,
-                accountType
-            );
-            // Ověření, že účet byl úspěšně vytvořen
-            await expect(response.status()).toBe(201);
-            createdAccounts.push(response);
-        });
-
-        dashboardPage = await loginPage.login(userCredentials.username, userCredentials.password);
-    });
-     */
     test.beforeEach(async ({ page, request }) => {
         // Inicializace API a přihlašovací stránky
         backendApi = new BackendApi(request);

@@ -2,14 +2,19 @@ import { expect, test } from "@playwright/test";
 import { DashboardPage } from "../../../src/pages/dashboard_page.ts";
 import { LoginPage } from "../../../src/pages/login_page.ts";
 import { dashboardProfileDetail } from "../../../src/assets/aria/dashboard_profile_detail.ts";
-import Dictionary from "../../../src/assets/dictionaries/dictionary.ts";
+import dictionary from "../../../src/assets/dictionaries/dictionary.ts";
 
 test.describe("Visual - Dashboard profilové informace", {
     tag: "@visual",
 }, () => {
+
+    // Inicializace stránky Dashboard
     let dashboardPage: DashboardPage;
 
     test.beforeEach(async ({ page }) => {
+        if (!process.env.TEGB_URL_FRONTEND || !process.env.TEGB_USERNAME || !process.env.TEGB_PASSWORD) {
+            throw new Error('Required environment variables are not set');
+        }
         const loginPage = new LoginPage(page);
         dashboardPage = await loginPage.openAndLogin(
             process.env.TEGB_URL_FRONTEND,
@@ -38,7 +43,7 @@ test.describe("Visual - Dashboard profilové informace", {
             .then((editProfilePage) => editProfilePage.fillPhone(userDate.phone))
             .then((editProfilePage) => editProfilePage.fillAge(userDate.age))
             .then((editProfilePage) => editProfilePage.clickSaveChanges())
-            .then((dashboardPage) => dashboardPage.checkUpdatedMessage(Dictionary.dashboard.profileDetails.updatedMessage));
+            .then((dashboardPage) => dashboardPage.checkUpdatedMessage(dictionary.dashboard.profileDetails.updatedMessage));
         await dashboardPage.updateMessage.waitFor({ state: "hidden" }); // počká, až se zpráva skryje
         await expect(dashboardPage.profileDetailsFrame).toHaveScreenshot("dashboard_profile_detail_visual_filled.png");
     });

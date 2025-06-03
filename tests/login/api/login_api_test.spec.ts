@@ -4,7 +4,7 @@ Vytvořte nový API test(přes volání API, ne přes odchycení) na přihlašov
 import { test, expect } from "@playwright/test";
 import { BackendApi } from "../../../src/api/backend_api.ts";
 
-test.describe("TEG#B - API Login", {
+test.describe("API testy - Login", {
     tag: "@api",
 }, () => {
     let backendApi: BackendApi;
