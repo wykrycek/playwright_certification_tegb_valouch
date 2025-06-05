@@ -32,6 +32,11 @@ const tegb = {
                 support: "Podpora",
             },
         },
+        profileEdit: {
+            heading: "UDetaily Profilu",
+            cancelButton: "Zrušit úpravy",
+            saveButton: "Uložit změny",
+        },
     },
     eng: {
         dashboard: {
@@ -65,6 +70,11 @@ const tegb = {
                 transactions: "Transactions",
                 support: "Support",
             },
+        },
+        profileEdit: {
+            heading: "Profile Details",
+            cancelButton: "Cancel Changes",
+            saveButton: "Save Changes",
         },
     },
 };

@@ -1,6 +1,3 @@
-/*
-Vytvořte nový API test(přes volání API, ne přes odchycení) na přihlašovací API, zkontrolujte, že Vám přišel token, a že status response je 201.
-*/
 import { test, expect } from "@playwright/test";
 import { BackendApi } from "../../../src/api/backend_api.ts";
 

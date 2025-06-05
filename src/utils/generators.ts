@@ -3,6 +3,6 @@ export function randomBankAccountType() {
     return types[Math.floor(Math.random() * types.length)];
 }
 
-export function randomBankAccountBallance() {
-    return Math.floor(Math.random() * 20000000) - 10000000;
+export function randomBankAccountBallance() { // Náhodné číslo mezi -1000 a 1000
+    return Math.floor(Math.random() * 2000) - 1000;
 }

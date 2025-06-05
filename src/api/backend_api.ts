@@ -14,10 +14,10 @@ export type accountData = {
     userId: number;
     accountNumber: string;
     accountType: string;
-    balance: string;
+    balance: number | string;
     createdDate: string;
     status: string;
-    updatedDate: null;
+    updatedDate: string | null;
 };
 
 export type accountsResponse = accountData[];
@@ -25,13 +25,21 @@ export type accountsResponse = accountData[];
 export class BackendApi {
     private readonly request: APIRequestContext;
     private readonly apiUrl = process.env.TEGB_URL_BACKEND;
+    readonly loginUrl = `${this.apiUrl}/tegb/login`;
+    readonly registerUrl = `${this.apiUrl}/tegb/register`;
+    readonly accountsUrl = `${this.apiUrl}/tegb/accounts`;
+    readonly accountsCreateUrl = `${this.apiUrl}/tegb/accounts/create`;
+    readonly accountsChangeBalanceUrl = `${this.apiUrl}/tegb/accounts/change-balance`;
+    readonly profileUrl = `${this.apiUrl}/tegb/profile`;
+    readonly profileEditUrl = `${this.apiUrl}/tegb/profile/edit`;
+    readonly profileClearUrl = `${this.apiUrl}/tegb/profile/clear`;
 
     constructor(request: APIRequestContext) {
         this.request = request;
     }
 
     async loginUser(username: string, password: string): Promise<APIResponse> {
-        const response = await this.request.post(`${this.apiUrl}/tegb/login`, {
+        const response = await this.request.post(this.loginUrl, {
             data: {
                 username: username,
                 password: password,
@@ -47,7 +55,7 @@ export class BackendApi {
     }
 
     async registerUser(username: string, password: string, email: string): Promise<APIResponse> {
-        const response = await this.request.post(`${this.apiUrl}/tegb/register`, {
+        const response = await this.request.post(this.registerUrl, {
             data: {
                 username,
                 password,
@@ -58,7 +66,7 @@ export class BackendApi {
     }
     
     async createBankAccount(bearerToken: string, startBalance: number, type: string): Promise<APIResponse> {
-        const response = await this.request.post(`${this.apiUrl}/tegb/accounts/create`, {
+        const response = await this.request.post(this.accountsCreateUrl, {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + bearerToken,
@@ -75,7 +83,7 @@ export class BackendApi {
         const responseLogin = await this.loginUser(username, password);
         const respondeLoginBody = await responseLogin.json();
         const bearerToken = respondeLoginBody.access_token;
-        const response = await this.request.post(`${this.apiUrl}/tegb/accounts/create`, {
+        const response = await this.request.post(this.accountsCreateUrl, {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + bearerToken,
@@ -93,7 +101,7 @@ export class BackendApi {
         const respondeLoginBody = await responseLogin.json();
         const bearerToken = respondeLoginBody.access_token;
         accountsData.forEach(async (accountData) => {
-            await this.request.post(`${this.apiUrl}/tegb/accounts/create`, {
+            await this.request.post(this.accountsCreateUrl, {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": "Bearer " + bearerToken,
@@ -108,7 +116,7 @@ export class BackendApi {
     }
 
     async changeBalance(bearerToken: string, accountId: number, amount: number): Promise<APIResponse> {
-        const response = await this.request.post(`${this.apiUrl}/tegb/accounts/change-balance`, {
+        const response = await this.request.post(this.accountsChangeBalanceUrl, {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + bearerToken,
@@ -122,7 +130,7 @@ export class BackendApi {
     }
 
     async getBankAccounts(bearerToken: string): Promise<APIResponse> {
-        const response = await this.request.get(`${this.apiUrl}/tegb/accounts`, {
+        const response = await this.request.get(this.accountsUrl, {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + bearerToken,
@@ -132,7 +140,7 @@ export class BackendApi {
     }
 
     async getProfile(bearerToken: string): Promise<APIResponse> {
-        const response = await this.request.get(`${this.apiUrl}/tegb/profile`, {
+        const response = await this.request.get(this.profileUrl, {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + bearerToken,
@@ -142,7 +150,7 @@ export class BackendApi {
     }
 
     async clearProfile(bearerToken: string, options: string[]): Promise<APIResponse> {
-        const response = await this.request.patch(`${this.apiUrl}/tegb/profile/clear`, {
+        const response = await this.request.patch(this.profileClearUrl, {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + bearerToken,
@@ -153,7 +161,7 @@ export class BackendApi {
     }
 
     async editProfile(bearerToken: string, profile: object): Promise<APIResponse> {
-        const response = await this.request.patch(`${this.apiUrl}/tegb/profile/edit`, {
+        const response = await this.request.patch(this.profileEditUrl, {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + bearerToken,

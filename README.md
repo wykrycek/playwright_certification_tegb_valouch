@@ -7,8 +7,7 @@
 ## 2. API
 ### ✔ kompletní (s přehahem o negativní testy)
 ## 3. DDT
-### ✘ nedokončeno
-- Zde trochu bojuji s tím, jak test postavit aby správně poukazoval na nalezené chyby (vlastně jsem ještě neodhalil, zda je v procesu vytváření účtů více než jedna chyba)
+### ✔ kompletní (s přehahem o detekci limitů bilance učtu na API a miximálního počtu zobrazených účtů v UI)
 ## 4. Atomické testy
 ### ✔ kompletní (s přesahem o vícejazyčnou kontrolu pomocí slovíku)
 ## 5. Vizuální testy
@@ -72,8 +71,8 @@
 #### Nastavení účtů - nefunkční tlačítko přidat
 - **Popis:** Tlačítko přidat nefunguje (proces je aktuálně v rámci testu řešen přes API)
 
-#### Nastavení účtů - chybová hláška při více než 4 účtech
-- **Popis:** Pokud je více účtů než 4, zobrazuje se chybová hláška "Unexpected error occured. Please try again later.". Přičemž ale API metoda `/tegb/accounts` data účtů vrací
+#### Nastavení účtů - chybová hláška při více než 3 účtech
+- **Popis:** Pokud je více účtů než 3, zobrazuje se chybová hláška "Unexpected error occured. Please try again later.". Přičemž ale API metoda `/tegb/accounts` data účtů vrací
 
 ### Editace profilu
 
@@ -97,6 +96,11 @@
 
 #### Success message - nesprávný jazyk
 - **Popis:** Success message - je v EN znění, zatímco zbytek textu na stránce je v CZ
+
+### Vytváření bankovních účtů
+
+#### API - nepřijímá velmi nízné a velmi vysoké hodnoty "bilance"
+- **Popis:** API nepřijme částku nižší než -99999999.99 a vyšší než 999999999.99. Při překročení se vrací HTTP 500 s hláškou `"Internal server error"`
 
 ## Drobné nedostatky
 

@@ -28,7 +28,7 @@ test.describe("Visual - Dashboard profilové informace", {
         await expect(dashboardPage.profileDetailsFrame).toHaveScreenshot("dashboard_profile_detail_visual.png");
     });
 
-    test("Dashboard profilové informace - vizuální test s předvyplněnými údaji", async () => {
+    test("Dashboard profilové informace - vizuální test s předvyplněnými údaji", async () => { // Požadovaný způsob testu
         const userDate = {
             firstName: "Jan",
             lastName: "Novák",
@@ -57,7 +57,7 @@ test.describe("Visual - Dashboard profilové informace", {
         });
     });
 
-    test("Dashboard profilové informace - vizuální test s JS modifikací", async () => { // vizuální test s JS modifikací, aby se textové uzly nahradily skrytými span elementy
+    test("Dashboard profilové informace - vizuální test s JS modifikací", async () => { // vizuální test s JS modifikací, aby se textové uzly nahradily skrytými span elementy . Alternativně lze i vyplňovat text.
         await expect(dashboardPage.profileDetailsFrame).toBeVisible();
         await dashboardPage.page.evaluate(() => {
             document.querySelectorAll('div.profile-detail').forEach(div => { // ve všech divech s třídou profile-detail..

@@ -2,6 +2,7 @@ import { type Page, type Locator, expect } from '@playwright/test';
 import { LoginPage } from './login_page.ts';
 import { ProfileEditPage } from './profile_edit_page.ts';
 import { type accountData, type accountsResponse } from '../api/backend_api.ts';
+import dictionary from '../assets/dictionaries/dictionary.ts';
 
 export class DashboardPage {
     readonly page: Page;
@@ -125,37 +126,6 @@ export class DashboardPage {
     }
     */
 
-    // TODO po opravě HTML (přidání uchopitelných elementů pro kontrolované hodnoty) odebrat a kontrolovat hodnoty přímo přes lokátory
-    // Vrárí textovou část z elementu obsahujícího label (<strong>) a požadovaný textový node
-    async getTextBoxValue(locator: Locator): Promise<string> {
-        return await locator.evaluate(node => node.lastChild?.textContent?.trim() || '');
-    }
-
-    async firstnameToHaveText(name: string): Promise<DashboardPage> {
-        expect.soft(await this.getTextBoxValue(this.firstnameFrame)).toContain(name);
-        return this;
-    }
-
-    async surnameToHaveText(surname: string): Promise<DashboardPage> {
-        expect.soft(await this.getTextBoxValue(this.surnameFrame)).toContain(surname);
-        return this;
-    }
-
-    async emailToHaveText(email: string): Promise<DashboardPage> {
-        expect.soft(await this.getTextBoxValue(this.emailFrame)).toContain(email);
-        return this;
-    }
-
-    async phoneToHaveText(phone: string): Promise<DashboardPage> {
-        expect.soft(await this.getTextBoxValue(this.phoneFrame)).toContain(phone);
-        return this;
-    }
-
-    async ageToHaveText(age: number): Promise<DashboardPage> {
-        expect.soft(await this.getTextBoxValue(this.ageFrame)).toContain(String(age));
-        return this;
-    }
-
     async checkUpdatedMessage(message: string): Promise<DashboardPage> {
         console.log(`Checking update message: ${message}`);
         await expect.soft(this.updateMessage).toBeVisible();
@@ -173,10 +143,33 @@ export class DashboardPage {
         return this;
     }
 
+    async firstnameContainText(name: string): Promise<DashboardPage> {
+        await expect.soft(this.firstnameFrame).toContainText(name);
+        return this;
+    }
 
+    async surnameContainText(surname: string): Promise<DashboardPage> {
+        await expect.soft(this.surnameFrame).toContainText(surname);
+        return this;
+    }
+
+    async emailContainText(email: string): Promise<DashboardPage> {
+        await expect.soft(this.emailFrame).toContainText(email);
+        return this;
+    }
+
+    async phoneContainText(phone: string): Promise<DashboardPage> {
+        await expect.soft(this.phoneFrame).toContainText(phone);
+        return this;
+    }
+
+    async ageContainText(age: number): Promise<DashboardPage> {
+        await expect.soft(this.ageFrame).toContainText(String(age));
+        return this;
+    }
 
     async checkNthAccount(index: number, account: accountData): Promise<DashboardPage> {
-        await expect.soft(this.accountsRows.nth(index)).toBeVisible();
+        await expect(this.accountsRows.nth(index)).toBeVisible();
         await expect.soft(this.accountNumberText.nth(index)).toBeVisible();
         await expect.soft(this.accountNumberText.nth(index)).toContainText(account.accountNumber);
         await expect.soft(this.accountBalanceText.nth(index)).toBeVisible();
@@ -185,14 +178,7 @@ export class DashboardPage {
         await expect.soft(this.accountTypeText.nth(index)).toContainText(account.accountType);
         return this;
     }
-/*
-    async checkAllAccounts(accountList: accountsResponse): Promise<DashboardPage> {
-        await Promise.all(accountList.map(async (account, index) => {
-            await this.checkNthAccount(index, account);
-        }));
-        return this;
-    }
-*/
+
     async checkAllAccounts(accountList: accountsResponse): Promise<DashboardPage> {
         await Promise.all(accountList.map(async (account, index) => {
             await this.checkNthAccount(index, account);
@@ -208,42 +194,96 @@ export class DashboardPage {
 
     async checkProfileEditOpen(): Promise<DashboardPage> { // obezlička přes ProfileEditPage - nezjistil jsem, jak/zda jde provést test v kopii DashboardPage
         const profileEditPage = await this.openEditProfile();
-        await expect.soft(profileEditPage.saveChangesButton).toBeVisible();
+        await expect.soft(profileEditPage.editProfileCancelButton).toHaveText(dictionary.profileEdit.cancelButton);
         await profileEditPage.editProfileCancelButton.click();
-        await expect.soft(this.editProfileButton).toBeVisible();
+        await expect.soft(this.editProfileButton).toHaveText(dictionary.dashboard.profileDetails.editProfileButton);
+        return this;
+    }
+
+    // TODO po opravě HTML (přidání uchopitelných elementů pro kontrolované hodnoty) odebrat a kontrolovat hodnoty přímo přes lokátory
+    // Vrárí textovou část z elementu obsahujícího label (<strong>) a požadovaný textový node
+    async getTextBoxValue(locator: Locator): Promise<string> {
+        return await locator.evaluate(node => node.lastChild?.textContent?.trim() || '');
+    }
+
+    async firstnameHaveText(name: string): Promise<DashboardPage> {
+        expect.soft(await this.getTextBoxValue(this.firstnameFrame)).toContain(name);
+        return this;
+    }
+
+    async surnameHaveText(surname: string): Promise<DashboardPage> {
+        expect.soft(await this.getTextBoxValue(this.surnameFrame)).toContain(surname);
+        return this;
+    }
+
+    async emailHaveText(email: string): Promise<DashboardPage> {
+        expect.soft(await this.getTextBoxValue(this.emailFrame)).toContain(email);
+        return this;
+    }
+
+    async phoneHaveText(phone: string): Promise<DashboardPage> {
+        expect.soft(await this.getTextBoxValue(this.phoneFrame)).toContain(phone);
+        return this;
+    }
+
+    async ageHaveText(age: number): Promise<DashboardPage> {
+        expect.soft(await this.getTextBoxValue(this.ageFrame)).toContain(String(age));
         return this;
     }
 
     // TODO - prozatím nechci kvůli diskutabilní spolehlivosti - chybějící tagy u hodnot (reportováno)
     /*
-    async checkFirstname(name: string): Promise<DashboardPage> {
+    async firstnameHaveText(name: string): Promise<DashboardPage> {
         await expect.soft(this.firstnameFrame).toContainText(name);
         return this;
     }
 
-    async checkSurname(surname: string): Promise<DashboardPage> {
+    async surnameHaveText(surname: string): Promise<DashboardPage> {
         await expect.soft(this.surnameFrame).toContainText(surname);
         return this;
     }
 
-    async checkEmail(email: string): Promise<DashboardPage> {
+    async emailHaveText(email: string): Promise<DashboardPage> {
         await expect.soft(this.emailFrame).toContainText(email);
         return this;
     }
 
-    async checkPhone(phone: string): Promise<DashboardPage> {
+    async phoneHaveText(phone: string): Promise<DashboardPage> {
         await expect.soft(this.phoneFrame).toContainText(phone);
         return this;
     }
 
-    async checkAge(age: number): Promise<DashboardPage> {
+    async ageHaveText(age: number): Promise<DashboardPage> {
         await expect.soft(this.ageFrame).toContainText(String(age));
         return this;
     }
     */
 
-    // Připraveno, zatím nepotřebné
-    /*
+    async firstnameIsVisible(): Promise<DashboardPage> {
+        await expect.soft(this.firstnameFrame).toBeVisible();
+        return this;
+    }
+
+    async surnameIsVisible(): Promise<DashboardPage> {
+        await expect.soft(this.surnameFrame).toBeVisible();
+        return this;
+    }
+
+    async emailIsVisible(): Promise<DashboardPage> {
+        await expect.soft(this.emailFrame).toBeVisible();
+        return this;
+    }
+
+    async phoneIsVisible(): Promise<DashboardPage> {
+        await expect.soft(this.phoneFrame).toBeVisible();
+        return this;
+    }
+
+    async ageIsVisible(): Promise<DashboardPage> {
+        await expect.soft(this.ageFrame).toBeVisible();
+        return this;
+    }
+    
     async checkAccountNumber(accountNumber: string): Promise<DashboardPage> {
         await expect.soft(this.accountNumberText).toContainText(accountNumber);
         return this;
@@ -277,5 +317,34 @@ export class DashboardPage {
         await expect.soft(this.accountsRows).toHaveCount(count);
         return this;
     }
-    */
+
+    async accountNumberIsVisible(): Promise<DashboardPage> {
+        await expect.soft(this.accountNumberText).toBeVisible();
+        return this;
+    }
+
+    async accountNthNumberIsVisible(index: number): Promise<DashboardPage> {
+        await expect.soft(this.accountsRows.nth(index)).toBeVisible();
+        return this;
+    }
+
+    async accountBalanceIsVisible(): Promise<DashboardPage> {
+        await expect.soft(this.accountBalanceText).toBeVisible();
+        return this;
+    }
+
+    async accountNthBalanceIsVisible(index: number): Promise<DashboardPage> {
+        await expect.soft(this.accountsRows.nth(index)).toBeVisible();
+        return this;
+    }
+
+    async accountTypeIsVisible(): Promise<DashboardPage> {
+        await expect.soft(this.accountTypeText).toBeVisible();
+        return this;
+    }
+
+    async accountNthTypeIsVisible(index: number): Promise<DashboardPage> {
+        await expect.soft(this.accountsRows.nth(index)).toBeVisible();
+        return this;
+    }
 }

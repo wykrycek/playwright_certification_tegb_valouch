@@ -12,17 +12,14 @@ test.describe("Atomické Testy - Dashboard", {
     let profileAccounts: accountsResponse;
 
     test.beforeEach(async ({ page }) => {
-        if (!process.env.TEGB_URL_FRONTEND || !process.env.TEGB_USERNAME || !process.env.TEGB_PASSWORD) {
-            throw new Error('Required environment variables are not set');
-        }
         // Inicializace API a přihlašovací stránky
         const backendApi = new BackendApi(page.request);
         const loginPage = new LoginPage(page);
         const responseLogin = loginPage.page.waitForResponse(`${process.env.TEGB_URL_BACKEND}/tegb/login`)
         dashboardPage = await loginPage.openAndLogin(
-            process.env.TEGB_URL_FRONTEND,
-            process.env.TEGB_USERNAME,
-            process.env.TEGB_PASSWORD
+            process.env.TEGB_URL_FRONTEND || "",
+            process.env.TEGB_USERNAME || "",
+            process.env.TEGB_PASSWORD || ""
         );
         const responseLoginBody = await (await responseLogin).json();
         const access_token = responseLoginBody.access_token;
@@ -32,59 +29,61 @@ test.describe("Atomické Testy - Dashboard", {
         profileAccounts = await responseProfileAccounts.json();
     });
     
-    test("Dashboard, Atomic - Logo", async () => {
-        await expect.soft(dashboardPage.logoImg).toBeVisible();
-        await expect.soft(dashboardPage.logoImg).toHaveAttribute("src", "/logo.png");
+    test("Dashboard, Atomic tests - struktura stránky", async () => {
+        await test.step("Logo", async () => {
+            await expect.soft(dashboardPage.logoImg).toBeVisible();
+            await expect.soft(dashboardPage.logoImg).toHaveAttribute("src", "/logo.png");
+        });
+        
+        await test.step("Header", async () => {
+            await expect.soft(dashboardPage.headerTitle).toBeVisible();
+            await expect.soft(dashboardPage.headerTitle).toHaveText(dictionary.dashboard.header.title);
+        });
+
+        await test.step("Levé Menu", async () => {
+            await expect.soft(dashboardPage.leftMenuFrame).toBeVisible();
+            await expect.soft(dashboardPage.homeMenuItem).toBeVisible();
+            await expect.soft(dashboardPage.homeMenuItem).toContainText(dictionary.dashboard.leftMenu.home);
+            await expect.soft(dashboardPage.accountsMenuItem).toBeVisible();
+            await expect.soft(dashboardPage.accountsMenuItem).toContainText(dictionary.dashboard.leftMenu.accounts);
+            await expect.soft(dashboardPage.transactionsMenuItem).toBeVisible();
+            await expect.soft(dashboardPage.transactionsMenuItem).toContainText(dictionary.dashboard.leftMenu.transactions);
+            await expect.soft(dashboardPage.supportMenuItem).toBeVisible();
+            await expect.soft(dashboardPage.supportMenuItem).toContainText(dictionary.dashboard.leftMenu.support);
+        });
+
+        await test.step("Profil", async () => {
+            await expect(dashboardPage.profileDetailsFrame).toBeVisible(); // (bez .soft) Pokud není, nepokračovat
+            await expect.soft(dashboardPage.profileDetailsTitle).toBeVisible();
+            await expect.soft(dashboardPage.profileDetailsTitle).toContainText(dictionary.dashboard.profileDetails.heading);
+            await expect.soft(dashboardPage.editProfileButton).toBeVisible();
+            await expect.soft(dashboardPage.editProfileButton).toContainText(dictionary.dashboard.profileDetails.editProfileButton);
+            await dashboardPage.checkProfileEditOpen();
+            await expect.soft(dashboardPage.firstnameLabel).toBeVisible();
+            await expect.soft(dashboardPage.firstnameLabel).toContainText(dictionary.dashboard.profileDetails.username);
+            await dashboardPage.firstnameHaveText(profileDetail.name); // ! vyměnit za toBeVisible() a toContainText() na elementu. Nyní je hodnota v text node - reportováno
+            await expect.soft(dashboardPage.surnameLabel).toBeVisible();
+            await expect.soft(dashboardPage.surnameLabel).toContainText(dictionary.dashboard.profileDetails.surname);
+            await dashboardPage.surnameHaveText(profileDetail.surname); // ! vyměnit za toBeVisible() a toContainText() na elementu. Nyní je hodnota v text node - reportováno
+            await expect.soft(dashboardPage.emailFrame).toBeVisible();
+            await expect.soft(dashboardPage.emailFrame).toContainText(dictionary.dashboard.profileDetails.email);
+            await dashboardPage.emailHaveText(profileDetail.email); // ! vyměnit za toBeVisible() a toContainText() na elementu. Nyní je hodnota v text node - reportováno
+            await expect.soft(dashboardPage.phoneFrame).toBeVisible();
+            await expect.soft(dashboardPage.phoneFrame).toContainText(dictionary.dashboard.profileDetails.phone);
+            await dashboardPage.phoneHaveText(profileDetail.phone); // ! vyměnit za toBeVisible() a toContainText() na elementu. Nyní je hodnota v text node - reportováno
+            await expect.soft(dashboardPage.ageFrame).toBeVisible();
+            await expect.soft(dashboardPage.ageFrame).toContainText(dictionary.dashboard.profileDetails.age);
+            await dashboardPage.ageHaveText(profileDetail.age); // ! vyměnit za toBeVisible() a toContainText() na elementu. Nyní je hodnota v text node - reportováno
+        });
+
+        await test.step("Zápatí", async () => {
+            await expect.soft(dashboardPage.footer).toBeVisible();
+            await expect.soft(dashboardPage.footer).toContainText(/© \d{4,} Banking App/); // ! otázka, zda nekontrolovat na aktuální rok.. (nereportováno)
+            //await expect.soft(dashboardPage.footer).toContainText(`© ${new Date().getFullYear() } Banking App`); // ..jen kdyby..
+        });
     });
 
-    test("Dashboard, Atomic - Header", async () => {
-        await expect.soft(dashboardPage.headerTitle).toBeVisible();
-        await expect.soft(dashboardPage.headerTitle).toHaveText(dictionary.dashboard.header.title);
-    });
-
-    test("Dashboard Atomic - Tlačítko Odhlásit", async() => {
-        await expect.soft(dashboardPage.logoutButon).toBeVisible();
-        await expect.soft(dashboardPage.logoutButon).toHaveText(dictionary.dashboard.header.logoutButton);
-        await dashboardPage.checkLogout();
-    });
-
-    test("Dashboard, Atomic - Levé Menu", async () => {
-        await expect.soft(dashboardPage.leftMenuFrame).toBeVisible();
-        await expect.soft(dashboardPage.homeMenuItem).toBeVisible();
-        await expect.soft(dashboardPage.homeMenuItem).toContainText(dictionary.dashboard.leftMenu.home);
-        await expect.soft(dashboardPage.accountsMenuItem).toBeVisible();
-        await expect.soft(dashboardPage.accountsMenuItem).toContainText(dictionary.dashboard.leftMenu.accounts);
-        await expect.soft(dashboardPage.transactionsMenuItem).toBeVisible();
-        await expect.soft(dashboardPage.transactionsMenuItem).toContainText(dictionary.dashboard.leftMenu.transactions);
-        await expect.soft(dashboardPage.supportMenuItem).toBeVisible();
-        await expect.soft(dashboardPage.supportMenuItem).toContainText(dictionary.dashboard.leftMenu.support);
-    });
-
-    test("Dashboard, Atomic - Profil", async () => {
-        await expect(dashboardPage.profileDetailsFrame).toBeVisible(); // (bez .soft) Pokud není, nepokračovat
-        await expect.soft(dashboardPage.profileDetailsTitle).toBeVisible();
-        await expect.soft(dashboardPage.profileDetailsTitle).toContainText(dictionary.dashboard.profileDetails.heading);
-        await expect.soft(dashboardPage.editProfileButton).toBeVisible();
-        await expect.soft(dashboardPage.editProfileButton).toContainText(dictionary.dashboard.profileDetails.editProfileButton);
-        await dashboardPage.checkProfileEditOpen();
-        await expect.soft(dashboardPage.firstnameLabel).toBeVisible();
-        await expect.soft(dashboardPage.firstnameLabel).toContainText(dictionary.dashboard.profileDetails.username);
-        await dashboardPage.firstnameToHaveText(profileDetail.name); // ! vyměnit za toBeVisible() a toContainText() na elementu. Nyní je hodnota v text node - reportováno
-        await expect.soft(dashboardPage.surnameLabel).toBeVisible();
-        await expect.soft(dashboardPage.surnameLabel).toContainText(dictionary.dashboard.profileDetails.surname);
-        await dashboardPage.surnameToHaveText(profileDetail.surname); // ! vyměnit za toBeVisible() a toContainText() na elementu. Nyní je hodnota v text node - reportováno
-        await expect.soft(dashboardPage.emailFrame).toBeVisible();
-        await expect.soft(dashboardPage.emailFrame).toContainText(dictionary.dashboard.profileDetails.email);
-        await dashboardPage.emailToHaveText(profileDetail.email); // ! vyměnit za toBeVisible() a toContainText() na elementu. Nyní je hodnota v text node - reportováno
-        await expect.soft(dashboardPage.phoneFrame).toBeVisible();
-        await expect.soft(dashboardPage.phoneFrame).toContainText(dictionary.dashboard.profileDetails.phone);
-        await dashboardPage.phoneToHaveText(profileDetail.phone); // ! vyměnit za toBeVisible() a toContainText() na elementu. Nyní je hodnota v text node - reportováno
-        await expect.soft(dashboardPage.ageFrame).toBeVisible();
-        await expect.soft(dashboardPage.ageFrame).toContainText(dictionary.dashboard.profileDetails.age);
-        await dashboardPage.ageToHaveText(profileDetail.age); // ! vyměnit za toBeVisible() a toContainText() na elementu. Nyní je hodnota v text node - reportováno
-    });
-
-    test("Dashboard, Atomic - Kontrola účtů uživatele", async () => {
+    test("Dashboard, Atomic tests - Kontrola účtů uživatele", async () => {
         await expect(dashboardPage.accountsFrame).toBeVisible(); // (bez .soft) Pokud není, nepokračovat
         await expect.soft(dashboardPage.accountsTitle).toBeVisible();
         await expect.soft(dashboardPage.accountsTitle).toContainText(dictionary.dashboard.accountsDetail.heading);
@@ -102,9 +101,9 @@ test.describe("Atomické Testy - Dashboard", {
         await dashboardPage.checkAllAccounts(profileAccounts);
     });
 
-    test("Dashboard, Atomic - Zápatí", async () => {
-        await expect.soft(dashboardPage.footer).toBeVisible();
-        await expect.soft(dashboardPage.footer).toContainText(/© \d{4,} Banking App/); // ! otázka, zda nekontrolovat na aktuální rok.. (nereportováno)
-        //await expect.soft(dashboardPage.footer).toContainText(`© ${new Date().getFullYear() } Banking App`); // ..jen kdyby..
+    test("Dashboard, Atomic tests - odhlášení", async () => {
+        await expect.soft(dashboardPage.logoutButon).toBeVisible();
+        await expect.soft(dashboardPage.logoutButon).toHaveText(dictionary.dashboard.header.logoutButton);
+        await dashboardPage.checkLogout();
     });
 });
