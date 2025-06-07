@@ -93,7 +93,7 @@ export class DashboardPage {
         // .accounts
         this.accountsFrame = page.locator('.accounts');
         this.accountsErrorMessage = page.locator('//p[@data-testid="accounts-error-message"]');
-        this.accountsTable = page.locator('.accounts-table'); // .accounts-table
+        this.accountsTable = page.locator('.accounts-table');
         this.accountsTitle = page.locator('//h2[@data-testid="accounts-title"]');
         this.newAccountButton = page.locator('.account-action');
         this.accountNumberHeading = page.locator('//th[@data-testid="account-number-heading"]');
@@ -165,24 +165,6 @@ export class DashboardPage {
 
     async ageContainText(age: number): Promise<DashboardPage> {
         await expect.soft(this.ageFrame).toContainText(String(age));
-        return this;
-    }
-
-    async checkNthAccount(index: number, account: accountData): Promise<DashboardPage> {
-        await expect(this.accountsRows.nth(index)).toBeVisible();
-        await expect.soft(this.accountNumberText.nth(index)).toBeVisible();
-        await expect.soft(this.accountNumberText.nth(index)).toContainText(account.accountNumber);
-        await expect.soft(this.accountBalanceText.nth(index)).toBeVisible();
-        await expect.soft(this.accountBalanceText.nth(index)).toContainText(String(account.balance));
-        await expect.soft(this.accountTypeText.nth(index)).toBeVisible();
-        await expect.soft(this.accountTypeText.nth(index)).toContainText(account.accountType);
-        return this;
-    }
-
-    async checkAllAccounts(accountList: accountsResponse): Promise<DashboardPage> {
-        await Promise.all(accountList.map(async (account, index) => {
-            await this.checkNthAccount(index, account);
-        }));
         return this;
     }
 
@@ -283,6 +265,24 @@ export class DashboardPage {
         await expect.soft(this.ageFrame).toBeVisible();
         return this;
     }
+
+    async checkNthAccount(index: number, account: accountData): Promise<DashboardPage> {
+        await expect(this.accountsRows.nth(index)).toBeVisible();
+        await expect.soft(this.accountNumberText.nth(index)).toBeVisible();
+        await expect.soft(this.accountNumberText.nth(index)).toContainText(account.accountNumber);
+        await expect.soft(this.accountBalanceText.nth(index)).toBeVisible();
+        await expect.soft(this.accountBalanceText.nth(index)).toContainText(String(account.balance));
+        await expect.soft(this.accountTypeText.nth(index)).toBeVisible();
+        await expect.soft(this.accountTypeText.nth(index)).toContainText(account.accountType);
+        return this;
+    }
+
+    async checkAllAccounts(accountList: accountsResponse): Promise<DashboardPage> {
+        await Promise.all(accountList.map(async (account, index) => {
+            await this.checkNthAccount(index, account);
+        }));
+        return this;
+    }
     
     async checkAccountNumber(accountNumber: string): Promise<DashboardPage> {
         await expect.soft(this.accountNumberText).toContainText(accountNumber);
@@ -345,6 +345,16 @@ export class DashboardPage {
 
     async accountNthTypeIsVisible(index: number): Promise<DashboardPage> {
         await expect.soft(this.accountsRows.nth(index)).toBeVisible();
+        return this;
+    }
+
+    async accountNthRowIsVisible(index: number): Promise<DashboardPage> {
+        await expect.soft(this.accountsRows.nth(index)).toBeVisible();
+        return this;
+    }
+
+    async waitForUpdateMessageClose(): Promise<DashboardPage> {
+        await expect.soft(this.updateMessage).toBeHidden();
         return this;
     }
 }

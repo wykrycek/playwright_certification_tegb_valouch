@@ -1,5 +1,18 @@
 const tegb = {
     ces: {
+        page: {
+            title: "TEG#B",
+        },
+        login: {
+            usernamePlaceholder: "Uživatelské jméno",
+            passwordPlaceholder: "Heslo",
+            forgottenPasswordButton: "Ztracené heslo",
+            registerButton: "Registruj se",
+            loginButton: "Login",
+            emptyUsernameMessage: "Uživatelské jméno je povinné",
+            emptyPasswordMessage: "Heslo je povinné",
+            registrationSuccess: "🎉 Registrace úspěšná! Vítejte v TEG#B! 🎉",
+        },
         dashboard: {
             profileDetails: {
                 heading: "Detaily Profilu",
@@ -39,6 +52,19 @@ const tegb = {
         },
     },
     eng: {
+        page: {
+            title: "TEG#B",
+        },
+        login: {
+            usernamePlaceholder: "Username",
+            passwordPlaceholder: "Password",
+            forgottenPasswordButton: "Lost password",
+            registerButton: "Register",
+            loginButton: "Login",
+            emmptyUsernameMessage: "Username is required",
+            emptyPasswordMessage: "Password is required",
+            registrationSuccess: "🎉 Registration succeeded! Welcome in TEG#B! 🎉",
+        },
         dashboard: {
             profileDetails: {
                 heading: "Profile Details",

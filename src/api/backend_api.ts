@@ -23,8 +23,8 @@ export type accountData = {
 export type accountsResponse = accountData[];
 
 export class BackendApi {
-    private readonly request: APIRequestContext;
-    private readonly apiUrl = process.env.TEGB_URL_BACKEND;
+    readonly request: APIRequestContext;
+    readonly apiUrl = process.env.TEGB_URL_BACKEND;
     readonly loginUrl = `${this.apiUrl}/tegb/login`;
     readonly registerUrl = `${this.apiUrl}/tegb/register`;
     readonly accountsUrl = `${this.apiUrl}/tegb/accounts`;

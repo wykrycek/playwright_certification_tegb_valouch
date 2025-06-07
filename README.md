@@ -1,125 +1,153 @@
-# playwright_certification_tegb_valouch
+# Playwright Certification TEGB
 
-# Stavy testů:
-## 1. E2E
-### ✘ nedokončeno
-- Nevyřešil jsem zatím optimální průchod testu aby dodržoval obecné předpoklady o podobě a zároveň spolehlivě poukazoval na nalezené chyby
-## 2. API
-### ✔ kompletní (s přehahem o negativní testy)
-## 3. DDT
-### ✔ kompletní (s přehahem o detekci limitů bilance učtu na API a miximálního počtu zobrazených účtů v UI)
-## 4. Atomické testy
-### ✔ kompletní (s přesahem o vícejazyčnou kontrolu pomocí slovíku)
-## 5. Vizuální testy
-### ✔ hotovo (s tím, že nevím, jakou/jaké verze testů ještě ponecháp k odevzání)
+## 📊 Stav testování
 
----
+| Typ testu | Status | Pokrytí | Poznámky |
+| --- | --- | --- | --- |
+| **E2E** | ❌ Nedokončeno | \-  | Optimalizace průchodu testů |
+| **API** | ✅ Kompletní | 100% | Včetně negativních testů |
+| **DDT** | ✅ Kompletní | 100% | Detekce limitů bilance a max. počtu účtů |
+| **Atomické** | ✅ Kompletní | 100% | Vícejazyčná kontrola |
+| **Vizuální** | ✅ Hotovo | 100% | Výběr finálních verzí k dokončení |
 
-## Vícejazyčnost:
-- řešeno pomocí env proměnné APP_LANG, např: `APP_LANG=eng npm start`, nebo `npm run test:eng`
-- slovník je umístěn v `/src/assets/dictionaries/dictionary.ts` a vrací obsah podle nastavené env `APP_LANG` (není potřeba předávat dodatečné parametry, což prozatím asi stačí)
-- v `/playwright.config.ts` je ošetřena výchozí hodnota na `ces`
+### ❌ E2E Testy - Nedokončeno
 
----
+Nevyřešil jsem zatím optimální průchod testu aby dodržoval obecné předpoklady o podobě a zároveň spolehlivě poukazoval na nalezené chyby.
 
-# Bug Report
+## 🌍 Vícejazyčnost
 
-## Kritické chyby
+### Konfigurace
+
+- **Environment jazyková proměnná:** `APP_LANG`
+- **Výchozí jazyk:** `ces` (čeština)
+- **Podporované jazyky:** `[ces, eng]`
+- **Slovník:** `/src/assets/dictionaries/dictionary.ts`
+- **Playwright config:** `/playwright.config.ts`
+
+* * *
+
+## 📋 Spuštění testů
+
+### Playwright UI
+
+```
+ npm start
+ npx playwright test --ui
+```
+
+### Vícejazyčné testování
+
+```
+npm run test:ces # Čeština (výchozí)
+npm run test:eng # Angličtina
+
+APP_LANG=ces npm start
+APP_LANG=eng npm start
+```
+
+### Shell
+
+```
+npx playwright test
+APP_LANG=eng npx playwright test --project=chromium --grep=tag
+```
+
+### Dostupné tagy
+
+```yml
+@atomic
+@e2e
+@api
+@visual
+@ddt
+@regress
+@regress-ui
+@regress-api
+```
+
+* * *
+
+## 🐛 Bug Report
+
+### Souhrn nálezů
+
+| Kategorie | Počet kritických | Počet drobných | Celkem |
+| --- | --- | --- | --- |
+| Login formulář | 4   | 2   | 6   |
+| Registrační formulář | 4   | 1   | 5   |
+| Dashboard | 8   | 2   | 10   |
+| Editace profilu | 7   | 1   | 8   |
+| API | 3   | 1   | 3   |
+| **CELKEM** | **25** | **7** | **32** |
+
+* * *
+
+## 🚨 Kritické chyby
 
 ### Login formulář
 
-#### Ztracené heslo - neodpovídající data-testid
-- **Popis:** Button má `data-testid="registration-link"`, mělo by být např. `"forgotten-password-button"`
-
-#### Ztracené heslo - nefunkční tlačítko
-- **Popis:** Tlačítko neprovádí žádnou akci (vyjma bodu níže)
-
-#### Validační error messages - nepřepínají se podle vybraného jazyka
-- **Popis:** Nepřepínají se podle vybraného jazyka (aktualizují se s opětovným odesláním nesprávných dat, nebo kliknutím na "Ztracené heslo")
-
-#### Validační error message chybného přihlášení - chybí CZ překlad
-- **Popis:** Nemá CZ překlad (jen EN "Login failed, check your credentials and try again.")
+| ID  | Chyba | Popis |
+| --- | --- | --- |
+| **LF-001** | Neodpovídající data-testid | Button "Ztracené heslo" má `data-testid="registration-link"`, mělo by být např. `"forgotten-password-button"` |
+| **LF-002** | Nefunkční tlačítko | Tlačítko "Ztracené heslo" neprovádí žádnou akci (mimo bodu níže) |
+| **LF-003** | Nepřekládají se validační hlášky | Validační chyby se nepřepínají při změně jazyka jazyka (aktualizují se s opětovným odesláním nesprávných dat, nebo kliknutím na "Ztracené heslo") |
+| **LF-004** | Chybí CZ překlad | Error message má jen EN text: "Login failed, check your credentials and try again." |
 
 ### Registrační formulář
 
-#### Neuloží se hodnota "Email"
-- **Popis:** Formulář jej odešle, ale API `/tegb/profile` jej nevrací
-
-#### Validace formuláře - nevalidovaná pole
-- **Popis:** Nejsou validována pole "Uživatelské jméno" a "Password" (odesílají se i prázdná: `{"username":"","password":"","email":"test@example.com"}`)
-
-#### Validace formuláře - nekonzistentní validace emailu
-- **Popis:** Prázdný email je validován alertem, nevalidní email je validován formulářem podle typu pole (obojí by bylo lepší nahradit "error-message")
-
-#### Nerespektuje volbu jazyka z Login formuláře
-- **Popis:** Výběr jazyka není nanízen, ani není respektována volba z login formuláře
+| ID  | Chyba | Popis |
+| --- | --- | --- |
+| **RF-001** | Neuloží se Email | Na `/tegb/register` se odešle, ale `/tegb/profile` jej nevrací (chyba API) |
+| **RF-002** | Nevalidovaná pole | Pole "Uživatelské jméno" a "Password" se nevalidují (odesílají se prázdná) |
+| **RF-003** | Nekonzistentní validace emailu | Prázdný email = alert, nevalidní email = formulářová validace |
+| **RF-004** | Nerespektuje jazyk | Výběr jazyka není nabízen ani respektován z login formuláře |
 
 ### Dashboard
 
-#### Nelze efektivně testovat obsah polí
-- **Popis:** Nelze efektivně testovat obsah polí "Jméno", "Příjmení", "Email", "Telefon", "Věk" - hodnota je vložena jako prostý text v jednom "div" elementu společně s labelem "strong". Vhodné by bylo hodnotu zabalit do nějakého elementu a přiřadit data-testid
-
-#### Přetékání hodnot nadřazený rámec
-- **Popis:** Hodnoty "Jméno", "Příjmení", "Email", "Telefon", "Věk" přetékají nadřazený rámec při větší délce obsahu (nejspíš souvisí s předchozím bodem)
-
-#### Levé menu - nefunkční tlačítka
-- **Popis:** V levém menu chybí funkce tlačítek - zobrazují se pouze graficky neupravené texty položek seznamu
-
-#### Nerespektuje volbu jazyka z Login formuláře
-- **Popis:** Výběr jazyka není nabízen, ani není respektována volba z login formuláře
-
-#### Nastavení účtů - nefunkční tlačítko přidat
-- **Popis:** Tlačítko přidat nefunguje (proces je aktuálně v rámci testu řešen přes API)
-
-#### Nastavení účtů - chybová hláška při více než 3 účtech
-- **Popis:** Pokud je více účtů než 3, zobrazuje se chybová hláška "Unexpected error occured. Please try again later.". Přičemž ale API metoda `/tegb/accounts` data účtů vrací
+| ID  | Chyba | Popis |
+| --- | --- | --- |
+| **DB-001** | Netestovatelná pole | Detail profilu - nelze efektivně testovat obsah polí "Jméno", "Příjmení", "Email", "Telefon", "Věk" - hodnoty jsou v prostém textu bez data-testid |
+| **DB-002** | Přetékání hodnot | Detail profilu - Dlouhé hodnoty přetékají nadřazený rámec |
+| **DB-003** | Nefunkční menu | Levé menu obsahuje pouze neupravené texty bez funkcí |
+| **DB-004** | Nerespektovaný jazyk | Výběr jazyka není nabízen ani respektován z login formuláře |
+| **DB-005** | Nefunkční tlačítko přidat | Tlačítko "Přidat účet" nefunguje |
+| **DB-006** | Chyba při 3+ účtech | Při více než 3 účtech UI zobrazuje chybu, i když API `/tegb/accounts` data vrací |
+| **DB-007** | Nerespektovaný jazyk | Při chybě zobrazení detailu účtů je zobrazena EN chyba "Unexpected error occured. Please try again later." i když zbytek stránky je v CZ |
+| **DB-008** | Reload odhlásí uživatele | Po reloadu stránky dojde k odhlášení - přechod na login s nutností nového přihlášení (projevuje se i při editaci profilu) |
 
 ### Editace profilu
 
-#### Validace - textová pole se nevalidují
-- **Popis:** Textová pole (mimo "Věk") se nevalidují (mohou být prázdná)
+| ID  | Chyba | Popis |
+| --- | --- | --- |
+| **EP-001** | Nevalidovaná textová pole | Textová pole (mimo "Věk") mohou být prázdná |
+| **EP-002** | Nekonzistentní validace věku | Prázdný/nevalidní věk se validuje alertem místo error-message |
+| **EP-003** | Chybí ID u inputů | Labely odkazují na `id`, ale inputy mají jen `data-testid` |
+| **EP-004** | Překlep v data-testid | "chage-{...}-input" → chybí "n" v "change" |
+| **EP-005** | Nerespektuje jazyk | Výběr jazyka není nabízen ani respektován z login formuláře |
+| **EP-006** | Chybí grafika success message | Success message se zobrazuje jako prostý text |
+| **EP-007** | Nesprávný jazyk success message | Success message je v EN, zbytek stránky v CZ (zobrazuje se na Dashboardu) |
 
-#### Validace Věk - nekonzistentní validace
-- **Popis:** Prázdné a nevalidní se validuje alertem (obojí by bylo lepší nahradit "error-message")
+### API
 
-#### Chybí ID u inputů
-- **Popis:** Labely u inputu odkazují na id inputu (parametrem "for"), ale inputy nemají id definované. Inputy mají definovány jen "data-testid" parametry
+| ID  | Chyba | Popis |
+| --- | --- | --- |
+| **API-001** | Limity bilance účtů | API `/tegb/accounts/create`,  `/tegb/accounts/change-balance` neakceptují hodnoty bilance &lt; -99999999.99 a &gt; 999999999.99 (HTTP 500) |
+| **API-002** | Účty nelze mazat | API nemá metody pro mazání uživatele, nebo jeho účtu (dost možná je to správně, ale takovou informaci nemám k dispozici) |
+| **API-003** | Změna zůstatku nepřijímá záporné částky | API `/tegb/accounts/change-balance` neakceptuje v hodnotě `amount` záporné častky |
 
-#### Překlep v data-testid
-- **Popis:** Překlep v data-testid: "chage-{...}-input" -> chybí "n" v "chage". U všech input polí (Jméno, Příjmení, Email, Telefon, Věk)
+* * *
 
-#### Nerespektuje volbu jazyka z Login formuláře
-- **Popis:** Výběr jazyka není nabízen, ani není respektována volba z login formuláře
+## ⚠️ Drobné nedostatky
 
-#### Success message - chybí grafika
-- **Popis:** Success message - není definována grafika - zobrazuje se jako prostý text
+### Styling a konvence
 
-#### Success message - nesprávný jazyk
-- **Popis:** Success message - je v EN znění, zatímco zbytek textu na stránce je v CZ
-
-### Vytváření bankovních účtů
-
-#### API - nepřijímá velmi nízné a velmi vysoké hodnoty "bilance"
-- **Popis:** API nepřijme částku nižší než -99999999.99 a vyšší než 999999999.99. Při překročení se vrací HTTP 500 s hláškou `"Internal server error"`
-
-## Drobné nedostatky
-
-### Login formulář, Registrační formulář
-- **Popis:** Class rámců "Login" a "Form" nestandardně začínají velkým písmenem
-
-### Login formulář, Registrační formulář, Dashboard
-- **Popis:** Stránky obsahují nepotřebné komentáře v HTML v hlavičce i body
-
-### Registrační formulář
-- **Popis:** Chybí logo a přepínače jazyků
-
-### Dashboard
-- **Popis:** Class rámce "App" nestandardně začíná velkým písmenem
-
-### Dashboard - div s informacemi o účtech
-- **Popis:** Div s informacemi o účtech uživatele nemá data-testid, pouze class "accounts" (div s profilem uživatele ano - data-testid="account-summary")
-
-### Editace profilu - validace Věk
-- **Popis:** Validuje se na číslo, ale typ pole je text
-
----
+| ID  | Oblast | Popis | Priorita |
+| --- | --- | --- | --- |
+| **S-001** | Login/Registrace | Class "Login" a "Form" začínají velkým písmenem | Nízká |
+| **S-002** | Všechny stránky | Nepotřebné výchozí komentáře v HTML | Nízká |
+| **S-003** | Registrace | Chybí logo a přepínače jazyků | Střední |
+| **S-004** | Dashboard, Editace profilu | Chybí přepínače jazyků | Střední |
+| **S-005** | Dashboard | Class "App" začíná velkým písmenem | Nízká |
+| **S-006** | Dashboard | Div s účty nemá data-testid | Nízká |
+| **S-007** | Editace profilu | Věk se validuje jako číslo, ale je textové pole | Nízká |
+| **S-008** | API | Metody, které mají informačí hodnotu success vrací HTTP 201 i když nic nevytváří. 201 by měly vracet pouze metody, které vytváří nové entitky | Střední |

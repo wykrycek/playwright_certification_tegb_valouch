@@ -1,4 +1,4 @@
-export const dashboardProfileDetail = `
+export const ariaDashboardProfileDetail = `
 - heading "Detaily Profilu" [level=2]
 - button "Upravit profil"
 - strong: "Jméno:"
@@ -12,5 +12,5 @@ export const dashboardProfileDetail = `
 - strong: "Věk:"
 - text: /[^\\n]+/
 `.trim();
-export default dashboardProfileDetail;
-export type DashboardProfileDetail = typeof dashboardProfileDetail;
+export default ariaDashboardProfileDetail;
+export type AriaDashboardProfileDetail = typeof ariaDashboardProfileDetail;

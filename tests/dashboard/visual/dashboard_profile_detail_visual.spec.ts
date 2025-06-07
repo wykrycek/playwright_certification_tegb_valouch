@@ -1,13 +1,12 @@
 import { expect, test } from "@playwright/test";
 import { DashboardPage } from "../../../src/pages/dashboard_page.ts";
 import { LoginPage } from "../../../src/pages/login_page.ts";
-import { dashboardProfileDetail } from "../../../src/assets/aria/dashboard_profile_detail.ts";
+import { ariaDashboardProfileDetail } from "../../../src/assets/aria/dashboard_profile_detail.ts";
 import dictionary from "../../../src/assets/dictionaries/dictionary.ts";
 
 test.describe("Visual - Dashboard profilové informace", {
     tag: "@visual",
 }, () => {
-
     // Inicializace stránky Dashboard
     let dashboardPage: DashboardPage;
 
@@ -23,12 +22,7 @@ test.describe("Visual - Dashboard profilové informace", {
         );
     });
 
-    test("Dashboard profilové informace - vizuální test", async () => { // základní vizuální test, který doufá, že hodnoty budodu vyplněny vždycky stejně
-        await expect(dashboardPage.profileDetailsFrame).toBeVisible();
-        await expect(dashboardPage.profileDetailsFrame).toHaveScreenshot("dashboard_profile_detail_visual.png");
-    });
-
-    test("Dashboard profilové informace - vizuální test s předvyplněnými údaji", async () => { // Požadovaný způsob testu
+    test("Dashboard profilové informace - vizuální test s předvyplněnými údaji", async () => {
         const userDate = {
             firstName: "Jan",
             lastName: "Novák",
@@ -43,8 +37,8 @@ test.describe("Visual - Dashboard profilové informace", {
             .then((editProfilePage) => editProfilePage.fillPhone(userDate.phone))
             .then((editProfilePage) => editProfilePage.fillAge(userDate.age))
             .then((editProfilePage) => editProfilePage.clickSaveChanges())
-            .then((dashboardPage) => dashboardPage.checkUpdatedMessage(dictionary.dashboard.profileDetails.updatedMessage));
-        await dashboardPage.updateMessage.waitFor({ state: "hidden" }); // počká, až se zpráva skryje
+            .then((dashboardPage) => dashboardPage.checkUpdatedMessage(dictionary.dashboard.profileDetails.updatedMessage))
+            .then((dashboardPage) => dashboardPage.waitForUpdateMessageClose()) // Počká, až se success zpráva skryje
         await expect(dashboardPage.profileDetailsFrame).toHaveScreenshot("dashboard_profile_detail_visual_filled.png");
     });
 
@@ -57,7 +51,7 @@ test.describe("Visual - Dashboard profilové informace", {
         });
     });
 
-    test("Dashboard profilové informace - vizuální test s JS modifikací", async () => { // vizuální test s JS modifikací, aby se textové uzly nahradily skrytými span elementy . Alternativně lze i vyplňovat text.
+    test("Dashboard profilové informace - vizuální test s JS modifikací", async () => { // vizuální test s JS modifikací, aby se textové uzly nahradily skrytými span elementy. Alternativně lze i vyplňovat text. 
         await expect(dashboardPage.profileDetailsFrame).toBeVisible();
         await dashboardPage.page.evaluate(() => {
             document.querySelectorAll('div.profile-detail').forEach(div => { // ve všech divech s třídou profile-detail..
@@ -76,6 +70,6 @@ test.describe("Visual - Dashboard profilové informace", {
 
     test("Dashboard profilové informace - ARIA snapshot", async () => { // alespoň že aria se nevzpouzí 🙂
         await expect(dashboardPage.profileDetailsFrame).toBeVisible();
-        await expect(dashboardPage.profileDetailsFrame).toMatchAriaSnapshot(dashboardProfileDetail);
+        await expect(dashboardPage.profileDetailsFrame).toMatchAriaSnapshot(ariaDashboardProfileDetail);
     });
 });

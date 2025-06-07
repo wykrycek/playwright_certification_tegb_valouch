@@ -1,6 +1,8 @@
-import { type Page, type Locator, expect } from '@playwright/test';
+import { type Page, type Locator, expect, APIRequestContext } from '@playwright/test';
 import { DashboardPage } from './dashboard_page.ts';
 import { RegisterPage } from './register_page.ts';
+import { ApiPseudoPage } from '../api/api_pseudo_page.ts';
+import dictionary from '../assets/dictionaries/dictionary.ts';
 
 export class LoginPage {
     readonly page: Page;
@@ -25,7 +27,7 @@ export class LoginPage {
         this.page = page;
 
         this.logoImage = page.locator('img.logo');
-        this.loginFormFrame = page.locator("div.Form"); // ! velké mísmeno, reportováno
+        this.loginFormFrame = page.locator("div.Form"); // ! velké mísmeno (reportováno - LF-001)
         this.loginForm = page.locator("//form[@data-testid='login-form']")
         this.languageButtonCZ = page.locator("//button[@data-testid='cz']");
         this.languageButtonEN = page.locator("//button[@data-testid='en']");
@@ -39,12 +41,20 @@ export class LoginPage {
         this.loginButton = page.locator("//button[@data-testid='submit-button']");
         this.loginErrorText = page.locator("//div[data-testid='login-form']/div[@class='error-message']");
 
-        this.registerSuccessText = page.locator("//div[@data-testid='success-message']"); // 🎉 Registration succeeded! Welcome in TEG#B! 🎉
+        this.registerSuccessText = page.locator("//div[@data-testid='success-message']");
     }
 
     async openLoginPage(url: string): Promise<LoginPage> {
         await this.page.goto(url);
+        await expect(this.page).toHaveTitle(dictionary.page.title); // Čekat, kdyby server spinkal..
+        if (process.env.APP_LANG === "eng") {
+            await this.languageButtonEN.click();
+        }
         return this;
+    }
+
+    async initializeBackendApi(request: APIRequestContext): Promise<ApiPseudoPage<LoginPage>> {
+        return new ApiPseudoPage(this, request);
     }
 
     async login(username: string, password: string): Promise<DashboardPage> {
@@ -55,7 +65,7 @@ export class LoginPage {
     }
 
     async openAndLogin(url: string, username: string, password: string): Promise<DashboardPage> {
-        await this.page.goto(url);
+        await this.openLoginPage(url);
         await this.fillUsername(username);
         await this.fillPassword(password);
         await this.clickLoginButton();
@@ -82,6 +92,7 @@ export class LoginPage {
         return new RegisterPage(this.page);
     }
 
+    // ! chyba - tlačítko neprovádí akci (reportováno - LF-002)
     // TODO - chybějící sekce (reportováno)
     /*
     async clickForgottenPasswordButton(): Promise<ForgottenPasswordPage> {
@@ -97,7 +108,7 @@ export class LoginPage {
 
     async checkRegistrationSuccess(): Promise<LoginPage> {
         await expect(this.registerSuccessText).toBeVisible();
-        await expect(this.registerSuccessText).toContainText('Registrace úspěšná!');
+        await expect(this.registerSuccessText).toHaveText(dictionary.login.registrationSuccess);
         return this;
     }
 

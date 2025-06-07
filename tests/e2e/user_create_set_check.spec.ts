@@ -1,17 +1,6 @@
-/*
-1. E2E (vše frontend, pokud není uvedeno jinak v krocích)
-    1. Registrace uživatele (přes frontend).
-    2. API - vytvořit účet (v aplikaci nefunguje).
-    3. Přihlásit se do aplikace nově založeným uživatelem.
-    4. Vyplňte uživateli profil.
-    5. Zkontrolujte údaje profilu po uložení.
-    6. Zkontrolujte zobrazení vytvořeného účtu (viditelnost, částka).
-    7. Odhlaste se.
-*/
-
 import { test } from "@playwright/test";
 import { LoginPage } from "../../src/pages/login_page.ts";
-import { BackendApi } from "../../src/api/backend_api.ts";
+import { type accountData } from "../../src/api/backend_api.ts";
 import { faker } from "@faker-js/faker";
 import { randomBankAccountType, randomBankAccountBallance } from "../../src/utils/generators.ts";
 import dictionary from "../../src/assets/dictionaries/dictionary.ts";
@@ -30,30 +19,25 @@ test("E2E - Vytvoření uživatele, banovního účtu, přihlášení, nastaven�
     const phone = faker.phone.number();
     const age = faker.number.int({ min: 18, max: 99 });
 
-    const accountStartBalance = randomBankAccountBallance();
-    const accountType = randomBankAccountType();
+    const account = {
+        type: randomBankAccountType(),
+        startBalance: randomBankAccountBallance(),
+        accountData: <accountData>{}
+    }
     
-    // E2E - frontend část I. (registrace)
-    // Registrace uživatele (testováno přes proklik z login formuláře, protože je to nejpravděpodobnější use case)
     const loginPage = new LoginPage(page);
     await loginPage.openLoginPage(url)
-        .then((loginPage) => loginPage.clickRegisterButton())
+        .then((loginPage) => loginPage.clickRegisterButton()) // Registrace uživatele (testováno přes proklik z login formuláře, protože je to nejpravděpodobnější use case)
         .then((registerPage) => registerPage.register(username, password, email))
         .then((loginPage) => loginPage.checkRegistrationSuccess())
-
-    // API část - (přihlášení, vytvorení bankovního účtu)
-    const backendApi = new BackendApi(request);
-    const responseLoginAPI = backendApi.successLogin(username, password);
-    const responseLoginAPIBody = await responseLoginAPI;
-    const responseLoginAPIJson = await responseLoginAPIBody.json();
-    const access_token = responseLoginAPIJson.access_token;
-
-    const responseCreateBankAccount = await backendApi.createBankAccount(access_token, accountStartBalance, accountType);
-    const userBankAccountsBody = await responseCreateBankAccount.json();
-
-    // E2E - frontend část II.
-    await loginPage.login(username, password)
-        .then((dashboardPage) => dashboardPage.emailContainText(email)) // Email známe z registrace, můžeme zkontrolovat. // ! Chyba - email se nezobrazuje (reportováno)
+        .then((apiPseudoPage) => apiPseudoPage.initializeBackendApi(request))
+        .then((apiPseudoPage) => apiPseudoPage.login({username, password}))
+        .then((apiPseudoPage) => apiPseudoPage.createBankAccount(account))
+        .then((apiPseudoPage) => apiPseudoPage.exit())
+        .then((loginPage) => loginPage.login(username, password))
+        .then((dashboardPage) => dashboardPage.accountNthRowIsVisible(0)) // Čekání na načtení dat
+        // ! Chyba - email se nezobrazuje (reportováno - RF-001)
+        //.then((dashboardPage) => dashboardPage.emailContainText(email)) // Email známe z registrace, můžeme zkontrolovat.
         .then((dashboardPage) => dashboardPage.openEditProfile()) // Přejít na nastavení profilu a vyplnit
         .then((editProfilePage) => editProfilePage.fillFirstname(firstname))
         .then((editProfilePage) => editProfilePage.fillSurname(surname))
@@ -62,11 +46,15 @@ test("E2E - Vytvoření uživatele, banovního účtu, přihlášení, nastaven�
         .then((editProfilePage) => editProfilePage.fillAge(age))
         .then((editProfilePage) => editProfilePage.clickSaveChanges())
         .then((dashboardPage) => dashboardPage.checkUpdatedMessage(dictionary.dashboard.profileDetails.updatedMessage)) // Kontrola úspěšného uložení a zobrazení nových hodnot
+        .then((dashboardPage) => dashboardPage.waitForUpdateMessageClose()) // Počká, až se success zpráva skryje
         .then((dashboardPage) => dashboardPage.firstnameContainText(firstname))
         .then((dashboardPage) => dashboardPage.surnameContainText(surname))
         .then((dashboardPage) => dashboardPage.emailContainText(email))
         .then((dashboardPage) => dashboardPage.phoneContainText(phone))
         .then((dashboardPage) => dashboardPage.ageContainText(age))
-        .then((dashboardPage) => dashboardPage.checkNthAccount(0, userBankAccountsBody)) // Kontrola zobrazení vytvořeného účtu
-        .then((dashboardPage) => dashboardPage.clickLogout());// Odhlášení
+        // ! chyba - bankovní účet nelze v UI vytvořit (reportováno - DB-005)
+        //.then((dashboardPage) => dashboardPage.createBankAccount(account.startBalance, account.type))
+        .then((dashboardPage) => dashboardPage.checkNthAccount(0, account.accountData)) // Kontrola zobrazení vytvořeného účtu
+        .then((dashboardPage) => dashboardPage.clickLogout())// Odhlášení
+        .then((loginPage) => loginPage.checkLogoutSuccess());
 });

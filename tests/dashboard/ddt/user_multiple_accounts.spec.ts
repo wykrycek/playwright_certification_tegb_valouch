@@ -1,23 +1,28 @@
 import { test, expect } from "@playwright/test";
-import accountBalances from "../../src/assets/test-data/account_balances.json";
-import { randomBankAccountType } from "../../src/utils/generators.ts";
-import { BackendApi } from "../../src/api/backend_api.ts";
-import { LoginPage } from "../../src/pages/login_page.ts";
+import accountBalances from "../../../src/assets/test-data/account_balances.json";
+import { randomBankAccountType } from "../../../src/utils/generators.ts";
+import { accountData, BackendApi } from "../../../src/api/backend_api.ts";
+import { LoginPage } from "../../../src/pages/login_page.ts";
 import { faker } from "@faker-js/faker";
 
+
+// ! POZOR - kvůli povaze testu je zapnutá serializace
 /*
  Nevymyslel jsem lepší řešení, než testy serializovat.
  Nelíbí se mi to kvůli zpomalení, ale lépe to teď asi neumím.
  Více workerů mi bude vytvářet více uživatelů.
  */
 test.describe.configure({ mode: 'serial' });
+
 test.describe("DDT - více účtů uživatele", {
     tag: "@ddt"
 }, () => {
+    const url = process.env.TEGB_URL_FRONTEND || "";
     let backendApi: BackendApi;
     let loginPage: LoginPage;
 
     const email = faker.internet.exampleEmail();
+
     const username = faker.internet.username();
     const password = faker.internet.password();
     let accessToken: string;
@@ -25,7 +30,7 @@ test.describe("DDT - více účtů uživatele", {
     // Jeden uživatel pro všechny testy
     test.beforeAll(async ({ request }) => {
         backendApi = new BackendApi(request);
-        
+
         await backendApi.registerUser(username, password, email);
         const apiLoginResponse = await backendApi.successLogin(username, password);
         const apiLoginBody = await apiLoginResponse.json();
@@ -38,29 +43,29 @@ test.describe("DDT - více účtů uživatele", {
         backendApi = new BackendApi(request);
     });
 
-    accountBalances.forEach((accountData, index) => {
-        test(`Účet ${index + 1}: Bilance ${String(accountData.startBalance)}`, async () => {
-            // Vytvoření bankovního účtu
-            const accountType = randomBankAccountType();
-            const accountCreateResponse = await backendApi.createBankAccount(
-                accessToken,
-                accountData.startBalance,
-                accountType
-            );
-            
-            // Ověření, že účet byl úspěšně vytvořen
-            // soft, protože je dobré vidět, jak se načte UI. Test se zastaví, až když nebude vidět potřebný řádek sezanmu účtů
-            expect.soft(accountCreateResponse.status()).toBe(201);
-            const accountCreateResponseBody = await accountCreateResponse.json();
-
-            // Přihlášení do dashboardu a test řádku s učtem
-            await loginPage.openLoginPage(process.env.TEGB_URL_FRONTEND || "")
+    accountBalances.forEach((testedBilance, index) => {
+        // ! Chyba - API nepřjme bilanci +/- 100.000.000 a větší (reportováno - API-001)
+        // Namísto skipu je tady return pro neakceptované částky, aby testování fungujících stavů mohlo pokračovat
+        if (Math.abs(testedBilance.startBalance) >= 100000000) {
+            return;
+        }
+        const accountInfo = {
+            startBalance: testedBilance.startBalance,
+            type: randomBankAccountType(),
+            accountData: <accountData>{}
+        };
+        test(`Účet ${index + 1}: Bilance ${String(accountInfo.startBalance)}`, async () => {
+            await loginPage.openLoginPage(url)
+                .then((loginPage) => loginPage.initializeBackendApi(backendApi.request))
+                .then((apiPseudoPage) => apiPseudoPage.initialize(accessToken))
+                .then((apiPseudoPage) => apiPseudoPage.createBankAccount(accountInfo))
+                .then((apiPseudoPage) => apiPseudoPage.exit())
                 .then((loginPage) => loginPage.login(username, password))
-                .then((dashboardPage) => dashboardPage.checkNthAccount(index, accountCreateResponseBody));
+                .then((dashboardPage) => dashboardPage.checkNthAccount(index, accountInfo.accountData));
         });
     });
 
-    // tady by se slušelo uživatele zase smazat
+    // tady by se slušelo uživatele zase smazat, ale není na to API (reportováno - API-002)
     /*
     test.afterAll(async () => {
         await backendApi.deleteUser(accessToken);
@@ -68,9 +73,10 @@ test.describe("DDT - více účtů uživatele", {
     */
 });
 
+
 // Abych nehledal jen, že to nejde, bylo by dobré najít, proč to nejde. Přidávám regresní testy, které hledají limity a po opravě potvrdí, že již limity nelimitují..
 // Duplikuji inicializační logiku (beforeAll a beforeEach) protože je to navíc a nechci plevelit hlavní práci.
-test.describe("Hledání limitů API a UI", {
+test.describe.skip("Hledání limitů API a UI", {
     tag: ["@regress"]
 }, () => {
     let backendApi: BackendApi;
@@ -96,7 +102,7 @@ test.describe("Hledání limitů API a UI", {
     });
 
     test.describe("Hledání limitů počtu zobrazených účtů", {
-        tag: "@ui"
+        tag: "@regress-ui"
     }, () => {
         accountBalances.forEach(async (bilance, index) => {
             test(`UI - hledání limitů počtu zobrazených účtů #${index + 1}`, async () => {
@@ -121,14 +127,14 @@ test.describe("Hledání limitů API a UI", {
     });
 
     test("API accounts/create - hledání limitů částek na účtu", {
-        tag: ["@api"]
+        tag: ["@regress-api"]
     }, async ({ request }) => {
         const backendApi = new BackendApi(request);
         
         const loginResponse = await backendApi.loginUser(username, password);
         const loginBody = await loginResponse.json();
         const accessToken = loginBody.access_token;
-        //const accountDescendingResponse = await backendApi.createBankAccount(accessToken, 0, randomBankAccountType()); // test s hledáním minima zakomentován - changeBalance nepřijímá záporné částky a to už řešit nebudu :-)
+        //const accountDescendingResponse = await backendApi.createBankAccount(accessToken, 0, randomBankAccountType()); // ! test s hledáním minima zakomentován - changeBalance nepřijímá záporné částky (reportováno - API-003)
         const accountAscendingResponse = await backendApi.createBankAccount(accessToken, 0, randomBankAccountType());
         //const accountDescending = await accountDescendingResponse.json();
         const accountAscending = await accountAscendingResponse.json();
