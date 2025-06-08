@@ -4,15 +4,11 @@
 
 | Typ testu | Status | Pokrytí | Poznámky |
 | --- | --- | --- | --- |
-| **E2E** | ❌ Nedokončeno | \-  | Optimalizace průchodu testů |
+| **E2E** | ✅ Kompletní | 100%  | |
 | **API** | ✅ Kompletní | 100% | Včetně negativních testů |
 | **DDT** | ✅ Kompletní | 100% | Detekce limitů bilance a max. počtu účtů |
 | **Atomické** | ✅ Kompletní | 100% | Vícejazyčná kontrola |
-| **Vizuální** | ✅ Hotovo | 100% | Výběr finálních verzí k dokončení |
-
-### ❌ E2E Testy - Nedokončeno
-
-Nevyřešil jsem zatím optimální průchod testu aby dodržoval obecné předpoklady o podobě a zároveň spolehlivě poukazoval na nalezené chyby.
+| **Vizuální** | ✅ Hotovo | 100% | |
 
 ## 🌍 Vícejazyčnost
 
@@ -73,12 +69,12 @@ APP_LANG=eng npx playwright test --project=chromium --grep=tag
 
 | Kategorie | Počet kritických | Počet drobných | Celkem |
 | --- | --- | --- | --- |
-| Login formulář | 4   | 2   | 6   |
+| Login formulář | 6   | 2   | 8   |
 | Registrační formulář | 4   | 1   | 5   |
 | Dashboard | 8   | 2   | 10   |
 | Editace profilu | 7   | 1   | 8   |
 | API | 3   | 1   | 3   |
-| **CELKEM** | **25** | **7** | **32** |
+| **CELKEM** | **27** | **7** | **34** |
 
 * * *
 
@@ -92,6 +88,8 @@ APP_LANG=eng npx playwright test --project=chromium --grep=tag
 | **LF-002** | Nefunkční tlačítko | Tlačítko "Ztracené heslo" neprovádí žádnou akci (mimo bodu níže) |
 | **LF-003** | Nepřekládají se validační hlášky | Validační chyby se nepřepínají při změně jazyka jazyka (aktualizují se s opětovným odesláním nesprávných dat, nebo kliknutím na "Ztracené heslo") |
 | **LF-004** | Chybí CZ překlad | Error message má jen EN text: "Login failed, check your credentials and try again." |
+| **LF-005** | Duplikace API volání | metody `/tegb/profile` a `/tegb/accounts` jsou po přihlášení volány 2x za sebou |
+| **LF-006** | Zpoždění login preflight | Preflight požadavek metody `/tegb/login` je odesílán cca 200ms po POST volání - pozorováno pouze v testovacím prostředí Playwright pro Firefox, který jediný i zde dodržuje CORS. V PC prohlížeči toto chování pozorováno nebylo. |
 
 ### Registrační formulář
 

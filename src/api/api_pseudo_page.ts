@@ -1,15 +1,15 @@
-import { expect, type APIRequestContext } from "@playwright/test";
-import { accountData, BackendApi } from "./backend_api";
+import { expect, type Page } from "@playwright/test";
+import { type accountData, BackendApi } from "./backend_api";
 
 export class ApiPseudoPage<Parent> {
     readonly parent: Parent;
-    readonly response: APIRequestContext;
+    readonly page: Page;
     readonly backendApi: BackendApi;
     accessToken: string;
 
-    constructor(parent: Parent, response: APIRequestContext) {
-        this.response = response;
-        this.backendApi = new BackendApi(response);
+    constructor(parent: Parent, page: Page) {
+        this.page = page;
+        this.backendApi = new BackendApi(page.request);
         this.accessToken = "";
         this.parent = parent;
     }
@@ -23,7 +23,7 @@ export class ApiPseudoPage<Parent> {
             throw new Error("Missing username or password");
         }
         const response = await this.backendApi.successLogin(creditials.username, creditials.password);
-        expect(response.status()).toBe(201);
+        expect(response.status()).toBe(201); // ! Mělo by být 200 (reportováno - S-008)
         this.accessToken = (await response.json()).access_token; // Použije se token z odpovědi
         creditials.access_token = this.accessToken; // Vrátí se token
         return this;

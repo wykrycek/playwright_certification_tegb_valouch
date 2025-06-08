@@ -12,21 +12,32 @@ test.describe("Atomické Testy - Dashboard", {
     let profileAccounts: accountsResponse;
 
     test.beforeEach(async ({ page }) => {
-        // Inicializace API a přihlašovací stránky
-        const backendApi = new BackendApi(page.request);
+        const username = process.env.TEGB_USERNAME || "";
+        const password = process.env.TEGB_PASSWORD || "";
+
         const loginPage = new LoginPage(page);
-        const responseLogin = loginPage.page.waitForResponse(`${process.env.TEGB_URL_BACKEND}/tegb/login`)
+        const backendApi = new BackendApi(page.request);
+
+        const responseProfileDetail = loginPage.page.waitForResponse(response =>
+            response.url() === backendApi.profileUrl &&
+            response.request().method() === 'GET'
+        );
+        const responseProfileAccounts = loginPage.page.waitForResponse(response =>
+            response.url() === backendApi.accountsUrl &&
+            response.request().method() === 'GET'
+        );
         dashboardPage = await loginPage.openAndLogin(
             process.env.TEGB_URL_FRONTEND || "",
-            process.env.TEGB_USERNAME || "",
-            process.env.TEGB_PASSWORD || ""
+            username,
+            password
         );
-        const responseLoginBody = await (await responseLogin).json();
-        const access_token = responseLoginBody.access_token;
-        const responseProfileDetail = await backendApi.getProfile(access_token);
-        const responseProfileAccounts = await backendApi.getBankAccounts(access_token);
-        profileDetail = await responseProfileDetail.json();
-        profileAccounts = await responseProfileAccounts.json();
+        
+        const profileDetailBody = await responseProfileDetail;
+        const profileAccountsBody = await responseProfileAccounts;
+        expect(profileDetailBody.status()).toBe(200);
+        expect(profileAccountsBody.status()).toBe(200);
+        profileDetail = await profileDetailBody.json();
+        profileAccounts = await profileAccountsBody.json();
     });
     
     test("Dashboard, Atomic tests - struktura stránky", async () => { // Více stepů v jednom testu (rychlejší prádění testů)

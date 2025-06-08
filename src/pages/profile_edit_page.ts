@@ -27,15 +27,15 @@ export class ProfileEditPage {
         this.saveChangesButton = page.locator('//button[@data-testid="save-changes-button"]');
 
         this.usernameLabel = page.locator('//label[@for="name"]');
-        this.firstnameInput = page.locator('//input[@data-testid="chage-name-input"]'); // TODO: opravit na change. Překlep reportován
+        this.firstnameInput = page.locator('//input[@data-testid="chage-name-input"]'); // ! opravit na change - překlep (reportováno - EP-004)
         this.surnameLabel = page.locator('//label[@for="surname"]');
-        this.surnameInput = page.locator('//input[@data-testid="chage-surname-input"]'); // TODO: opravit na change. Překlep reportován
+        this.surnameInput = page.locator('//input[@data-testid="chage-surname-input"]'); // ! opravit na change - překlep (reportováno - EP-004)
         this.emailLabel = page.locator('//label[@for="email"]');
-        this.emailInput = page.locator('//input[@data-testid="chage-email-input"]'); // TODO: opravit na change. Překlep reportován
+        this.emailInput = page.locator('//input[@data-testid="chage-email-input"]'); // ! opravit na change - překlep (reportováno - EP-004)
         this.phoneLabel = page.locator('//label[@for="phone"]');
-        this.phoneInput = page.locator('//input[@data-testid="chage-phone-input"]'); // TODO: opravit na change. Překlep reportován
+        this.phoneInput = page.locator('//input[@data-testid="chage-phone-input"]'); // ! opravit na change - překlep (reportováno - EP-004)
         this.ageLabel = page.locator('//label[@for="age"]');
-        this.ageInput = page.locator('//input[@data-testid="chage-age-input"]'); // TODO: opravit na change. Překlep reportován
+        this.ageInput = page.locator('//input[@data-testid="chage-age-input"]'); // ! opravit na change - překlep (reportováno - EP-004)
     }
 
     async fillFirstname(name: string): Promise<ProfileEditPage> {

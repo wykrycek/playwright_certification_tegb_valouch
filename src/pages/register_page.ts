@@ -11,7 +11,7 @@ export class RegisterPage {
     readonly emailInput: Locator;
     readonly backToLoginButton: Locator;
     readonly registerButton: Locator;
-    //readonly registerErrorText: Locator;
+    //readonly registerErrorText: Locator; // Přesunuto do LoginPage, jen jsem si neujasnil, jestli je to dobře
 
     constructor(page: Page) {
         this.page = page;
@@ -27,7 +27,7 @@ export class RegisterPage {
     }
 
     /*
-    Error o chybném login je v alert okně. Odchytit a kontrolovat jeho obsah.
+    TODO: Error o chybném login je v alert okně. Odchytit a kontrolovat jeho obsah.
     */
 
     async openRegisterPage(url: string): Promise<RegisterPage> {

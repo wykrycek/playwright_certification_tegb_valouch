@@ -8,7 +8,7 @@ import dictionary from "../../src/assets/dictionaries/dictionary.ts";
 
 test("E2E - Vytvoření uživatele, banovního účtu, přihlášení, nastavení profilu, ověření", {
     tag: "@e2e",
-}, async ({ page, request }) => {
+}, async ({ page }) => {
     const url = process.env.TEGB_URL_FRONTEND || "";
     const username = faker.internet.username();
     const password = faker.internet.password();
@@ -30,7 +30,7 @@ test("E2E - Vytvoření uživatele, banovního účtu, přihlášení, nastaven�
         .then((loginPage) => loginPage.clickRegisterButton()) // Registrace uživatele (testováno přes proklik z login formuláře, protože je to nejpravděpodobnější use case)
         .then((registerPage) => registerPage.register(username, password, email))
         .then((loginPage) => loginPage.checkRegistrationSuccess())
-        .then((apiPseudoPage) => apiPseudoPage.initializeBackendApi(request))
+        .then((apiPseudoPage) => apiPseudoPage.initializeBackendApi())
         .then((apiPseudoPage) => apiPseudoPage.login({username, password}))
         .then((apiPseudoPage) => apiPseudoPage.createBankAccount(account))
         .then((apiPseudoPage) => apiPseudoPage.exit())

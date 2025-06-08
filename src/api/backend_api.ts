@@ -50,7 +50,7 @@ export class BackendApi {
 
     async successLogin(username: string, password: string): Promise<APIResponse> {
         const response = await this.loginUser(username, password);
-        expect(response.status()).toBe(201);
+        expect(response.status()).toBe(201); // ! Mělo by být 200 (reportováno - S-008)
         return response;
     }
 

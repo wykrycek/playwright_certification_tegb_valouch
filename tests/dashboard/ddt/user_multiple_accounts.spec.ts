@@ -10,7 +10,9 @@ import { faker } from "@faker-js/faker";
 /*
  Nevymyslel jsem lepší řešení, než testy serializovat.
  Nelíbí se mi to kvůli zpomalení, ale lépe to teď asi neumím.
- Více workerů mi bude vytvářet více uživatelů.
+ => Více workerů mi bude vytvářet více uživatelů.
+
+ TODO: Po průzkumu možnosí by řeším mohla být fiture a předávání login stavů.
  */
 test.describe.configure({ mode: 'serial' });
 
@@ -56,7 +58,7 @@ test.describe("DDT - více účtů uživatele", {
         };
         test(`Účet ${index + 1}: Bilance ${String(accountInfo.startBalance)}`, async () => {
             await loginPage.openLoginPage(url)
-                .then((loginPage) => loginPage.initializeBackendApi(backendApi.request))
+                .then((loginPage) => loginPage.initializeBackendApi())
                 .then((apiPseudoPage) => apiPseudoPage.initialize(accessToken))
                 .then((apiPseudoPage) => apiPseudoPage.createBankAccount(accountInfo))
                 .then((apiPseudoPage) => apiPseudoPage.exit())
@@ -121,7 +123,7 @@ test.describe.skip("Hledání limitů API a UI", {
                 // Přihlášení do dashboardu a test řádku s učtem
                 await loginPage.openLoginPage(process.env.TEGB_URL_FRONTEND || "")
                     .then((loginPage) => loginPage.login(username, password))
-                    .then((dashboardPage) => dashboardPage.checkNthAccount(index, accountCreateResponseBody)); // 4. cyklus skončí chybou, přesto že vytvořený účet v API přijde. (reportováno)
+                    .then((dashboardPage) => dashboardPage.checkNthAccount(index, accountCreateResponseBody)); // ! 4. cyklus skončí chybou, přesto že vytvořený účet v API přijde. (reportováno - DB-006)
             });
         });
     });
@@ -149,12 +151,12 @@ test.describe.skip("Hledání limitů API a UI", {
             //const accountDescendingResponse = await backendApi.changeBalance(accessToken, accountDescending.accountId, amount * -1);
             const accountAscendingResponse = await backendApi.changeBalance(accessToken, accountAscending.accountId, amount);
 
-            //expect.soft(accountDescendingResponse.status()).toBe(201); // change by nemělo vracet 201, ale 200
-            expect.soft(accountAscendingResponse.status()).toBe(201); // change by nemělo vracet 201, ale 200
+            //expect.soft(accountDescendingResponse.status()).toBe(201); // ! Mělo by být 200 (reportováno - S-008)
+            expect.soft(accountAscendingResponse.status()).toBe(201); // ! Mělo by být 200 (reportováno - S-008)
 
             //if (accountDescendingResponse.status() != 201) minBalance = (amount * -1) + 0.01;
-            if (accountAscendingResponse.status() != 201) minBalance = (amount * -1) + 0.01; // Částku 100 mega a víc API nepřijme (reportováno). (Kéž by se mě takový problém týkal :-)
-            if (accountAscendingResponse.status() != 201) maxBalance = amount - 0.01;
+            if (accountAscendingResponse.status() != 201) minBalance = (amount * -1) + 0.01; // Částku 100 mega a víc API nepřijme (reportováno). (Kéž by se mě takový problém týkal :-) // ! opravit po opravě S-008
+            if (accountAscendingResponse.status() != 201) maxBalance = amount - 0.01; // ! opravit po opravě S-008
 
             if (minBalance !== 0 || maxBalance !== 0) {
                 console.log(`minBalance: ${minBalance}, maxBalance: ${maxBalance}`);

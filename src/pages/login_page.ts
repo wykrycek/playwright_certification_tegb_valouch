@@ -1,4 +1,4 @@
-import { type Page, type Locator, expect, APIRequestContext } from '@playwright/test';
+import { type Page, type Locator, expect } from '@playwright/test';
 import { DashboardPage } from './dashboard_page.ts';
 import { RegisterPage } from './register_page.ts';
 import { ApiPseudoPage } from '../api/api_pseudo_page.ts';
@@ -53,8 +53,8 @@ export class LoginPage {
         return this;
     }
 
-    async initializeBackendApi(request: APIRequestContext): Promise<ApiPseudoPage<LoginPage>> {
-        return new ApiPseudoPage(this, request);
+    async initializeBackendApi(): Promise<ApiPseudoPage<LoginPage>> {
+        return new ApiPseudoPage(this, this.page);
     }
 
     async login(username: string, password: string): Promise<DashboardPage> {
@@ -69,6 +69,18 @@ export class LoginPage {
         await this.fillUsername(username);
         await this.fillPassword(password);
         await this.clickLoginButton();
+        return new DashboardPage(this.page);
+    }
+
+    async logitWithCreditials(creditials: {username: string, password: string, accessToken?: string}): Promise<DashboardPage> {
+        const loginResponse = this.page.waitForResponse(/\/tegb\/login/);
+        await this.fillUsername(creditials.username);
+        await this.fillPassword(creditials.password);
+        await this.clickLoginButton();
+        const loginResponseBody = await loginResponse;
+        const loginResponseJson = await loginResponseBody.json();
+        const accessToken = loginResponseJson.access_token;
+        creditials.accessToken = accessToken;
         return new DashboardPage(this.page);
     }
 

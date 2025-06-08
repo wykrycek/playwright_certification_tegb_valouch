@@ -1,6 +1,7 @@
 import { type Page, type Locator, expect } from '@playwright/test';
 import { LoginPage } from './login_page.ts';
 import { ProfileEditPage } from './profile_edit_page.ts';
+import { ApiPseudoPage } from '../api/api_pseudo_page.ts';
 import { type accountData, type accountsResponse } from '../api/backend_api.ts';
 import dictionary from '../assets/dictionaries/dictionary.ts';
 
@@ -118,7 +119,11 @@ export class DashboardPage {
         return new ProfileEditPage(this.page);
     }
 
-    // TODO - chybějící sekce (reportováno)
+    async initializeBackendApi(): Promise<ApiPseudoPage<DashboardPage>> {
+        return new ApiPseudoPage(this, this.page);
+    }
+
+    // ! chybějící sekce (reportováno - DB-005)
     /*
     async clickNewAccount(): Promise<NewAccountPage> {
         await this.newAccountButton.click();
@@ -182,6 +187,7 @@ export class DashboardPage {
         return this;
     }
 
+    // ! Kvůli spolehlivé kontrole obsahu položek Detailu profilu jsou zde dočasné metody, které kontrolují skutečný text v text node elementu, dokud nebude obalen nějakým elementem (reportováno - DB-001)
     // TODO po opravě HTML (přidání uchopitelných elementů pro kontrolované hodnoty) odebrat a kontrolovat hodnoty přímo přes lokátory
     // Vrárí textovou část z elementu obsahujícího label (<strong>) a požadovaný textový node
     async getTextBoxValue(locator: Locator): Promise<string> {
@@ -213,30 +219,30 @@ export class DashboardPage {
         return this;
     }
 
-    // TODO - prozatím nechci kvůli diskutabilní spolehlivosti - chybějící tagy u hodnot (reportováno)
+    // ! prozatím nechci kvůli diskutabilní spolehlivosti - chybějící tagy u hodnot (reportováno - DB-001)
     /*
     async firstnameHaveText(name: string): Promise<DashboardPage> {
-        await expect.soft(this.firstnameFrame).toContainText(name);
+        await expect.soft(this.firstnameText).toHaveText(name);
         return this;
     }
 
     async surnameHaveText(surname: string): Promise<DashboardPage> {
-        await expect.soft(this.surnameFrame).toContainText(surname);
+        await expect.soft(this.surnameText).toHaveText(surname);
         return this;
     }
 
     async emailHaveText(email: string): Promise<DashboardPage> {
-        await expect.soft(this.emailFrame).toContainText(email);
+        await expect.soft(this.emailText).toHaveText(email);
         return this;
     }
 
     async phoneHaveText(phone: string): Promise<DashboardPage> {
-        await expect.soft(this.phoneFrame).toContainText(phone);
+        await expect.soft(this.phoneText).toHaveText(phone);
         return this;
     }
 
     async ageHaveText(age: number): Promise<DashboardPage> {
-        await expect.soft(this.ageFrame).toContainText(String(age));
+        await expect.soft(this.ageText).toHaveText(String(age));
         return this;
     }
     */
