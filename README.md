@@ -2,13 +2,13 @@
 
 ## 📊 Stav testování
 
-| Typ testu | Status | Pokrytí | Poznámky |
-| --- | --- | --- | --- |
-| **E2E** | ✅ Kompletní | 100%  | |
-| **API** | ✅ Kompletní | 100% | Včetně negativních testů |
-| **DDT** | ✅ Kompletní | 100% | Detekce limitů bilance a max. počtu účtů |
-| **Atomické** | ✅ Kompletní | 100% | Vícejazyčná kontrola |
-| **Vizuální** | ✅ Hotovo | 100% | |
+| Typ testu | Poznámky |
+| --- | --- | --- |
+| **E2E** | ✅ Hotovo | |
+| **API** | ✅ Hotovo | Včetně negativních testů |
+| **DDT** | ✅ Hotovo | Detekce limitů bilance a max. počtu účtů |
+| **Atomické** | ✅ Hotovo | Vícejazyčná kontrola |
+| **Vizuální** | ✅ Hotovo | |
 
 ## 🌍 Vícejazyčnost
 
@@ -18,7 +18,6 @@
 - **Výchozí jazyk:** `ces` (čeština)
 - **Podporované jazyky:** `[ces, eng]`
 - **Slovník:** `/src/assets/dictionaries/dictionary.ts`
-- **Playwright config:** `/playwright.config.ts`
 
 * * *
 
