@@ -2,7 +2,7 @@
 
 ## 📊 Stav testování
 
-| Typ testu | Poznámky |
+| Typ testu | Stav | Poznámky |
 | --- | --- | --- |
 | **E2E** | ✅ Hotovo | |
 | **API** | ✅ Hotovo | Včetně negativních testů |
